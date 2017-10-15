@@ -4,3 +4,6 @@
 # Vim
 *.swp
 
+# Python
+.ipynb_checkpoints/
+

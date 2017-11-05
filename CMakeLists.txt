@@ -5,14 +5,18 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
         lib/json.hpp
-        src/app/main.cc
-        src/finance/asset.cc
-        src/finance/asset.hh
-        src/finance/portfolio.cc
-        src/finance/portfolio.hh
-        src/optimization/optimizer.cc
-        src/optimization/optimizer.hh
-        src/parsing/parse.cc
-        src/parsing/parse.hh)
+        src/app/main.cpp
+        src/finance/asset.cpp
+        src/finance/asset.hpp
+        src/finance/portfolio.cpp
+        src/finance/portfolio.hpp
+        src/optimization/optimizer.cpp
+        src/optimization/optimizer.hpp
+				src/helpers/date.cpp
+				src/helpers/date.hpp
+        src/parsing/parse.cpp
+        src/parsing/parse.hpp)
 
-add_executable(dolphin_private ${SOURCE_FILES})
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR})
+
+add_executable(dolphin ${SOURCE_FILES})

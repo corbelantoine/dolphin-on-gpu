@@ -5,56 +5,56 @@ namespace hlp
 
 Date::Date(std::string str_date)
 {
-  this.year = std::stoi(str_date.substr(0, 4));
-  this.month = std::stoi(str_date.substr(5, 2));
-  this.day = std::stoi(str_date.substr(8, 2));
+  this->year = std::stoi(str_date.substr(0, 4));
+  this->month = std::stoi(str_date.substr(5, 2));
+  this->day = std::stoi(str_date.substr(8, 2));
 }
 
-int Date::get_day()
+int Date::get_day() const
 {
-  return this.day;
+  return this->day;
 }
 
-int Date::get_month()
+int Date::get_month() const
 {
-  return this.month;
+  return this->month;
 }
 
-int Date::get_year()
+int Date::get_year() const
 {
-  return this.year;
+  return this->year;
 }
 
 void Date::set_day(int day)
 {
   if (day > 0 && day < 32)
-    this.day = day;
+    this->day = day;
 }
 
 void Date::set_month(int month)
 {
   if (month > 0 and month < 13)
-    this.month = month;
+    this->month = month;
 }
 void Date::set_year(int year) {
   if (year > 1900 && year < 2100)
-    this.year = year;
+    this->year = year;
 }
 
 bool Date::operator<(const Date& d)
 {
   // check year
-  if (this.year < d.year)
+  if (this->year < d.get_year())
     return true;
-  else if (this.year > d.year)
+  else if (this->year > d.get_year())
     return false;
   // check month
-  if (this.month < d.month)
+  if (this->month < d.get_month())
     return true;
-  else if (this.month > d.month)
+  else if (this->month > d.get_month())
     return false;
   // check day
-  if (this.day < d.day)
+  if (this->day < d.get_day())
     return true;
   return false;
 }
@@ -62,25 +62,25 @@ bool Date::operator<(const Date& d)
 
 bool Date::operator>(const Date& d)
 {
-  return ! this < d;
+  return !(*this < d);
 }
 
 bool Date::operator==(const Date& d)
 {
-  return this.year == d.year && this.month == d.month && this.day = d.day;
+  return this->year == d.get_year() && this->month == d.get_month() && this->day == d.get_day();
 }
 
 bool Date::operator!=(const Date& d)
 {
-  return ! this == d;
+  return !(*this == d);
 }
 
 std::ostream& operator<<(std::ostream& os, const Date& d)
 {
   // write obj to stream
-  std::cout << d.year << "-"
-            << d.month << "-"
-            << d.day
+  std::cout << d.get_year() << "-"
+            << d.get_month() << "-"
+            << d.get_day();
   return os;
 }
 

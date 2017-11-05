@@ -5,7 +5,7 @@
 #include <fstream>
 #include <printf.h>
 #include <iostream>
-#include "parse.hh"
+#include "parse.hpp"
 #include "../../lib/json.hpp"
 
 using json = nlohmann::json;

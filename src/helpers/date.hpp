@@ -12,9 +12,9 @@ public:
   Date(std::string str_date);
   ~Date() = default;
 
-  int get_day();
-  int get_month();
-  int get_year();
+  int get_day() const;
+  int get_month() const;
+  int get_year() const;
 
   void set_day(int day);
   void set_month(int month);

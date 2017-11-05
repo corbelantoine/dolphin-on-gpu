@@ -1,16 +1,16 @@
 #pragma once
 
 #include <vector>
-#include "../helpers/date"
+#include "../helpers/date.hpp"
 
 namespace fin
 {
 
 struct close
 {
-  Date date;
+  hlp::Date date;
   float value;
-}
+};
 
 class Asset
 {
@@ -26,6 +26,6 @@ private:
   std::vector<close> closes;
 
   void sort_closes();
-}
+};
 
 }

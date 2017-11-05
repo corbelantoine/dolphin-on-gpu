@@ -41,7 +41,7 @@ void Date::set_year(int year) {
     this->year = year;
 }
 
-bool Date::operator<(const Date& d)
+bool Date::operator<(const Date& d) const
 {
   // check year
   if (this->year < d.get_year())
@@ -60,17 +60,17 @@ bool Date::operator<(const Date& d)
 }
 
 
-bool Date::operator>(const Date& d)
+bool Date::operator>(const Date& d) const
 {
   return !(*this < d);
 }
 
-bool Date::operator==(const Date& d)
+bool Date::operator==(const Date& d) const
 {
   return this->year == d.get_year() && this->month == d.get_month() && this->day == d.get_day();
 }
 
-bool Date::operator!=(const Date& d)
+bool Date::operator!=(const Date& d) const
 {
   return !(*this == d);
 }

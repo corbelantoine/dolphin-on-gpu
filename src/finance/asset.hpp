@@ -20,7 +20,7 @@ public:
 
   void set_closes(std::vector<close> closes);
 
-  float get_return(tm* start_date, tm* end_date);
+  float get_return(hlp::Date start_date, hlp::Date end_date);
 
 private:
   std::vector<close> closes;

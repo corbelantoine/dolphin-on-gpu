@@ -20,10 +20,10 @@ public:
   void set_month(int month);
   void set_year(int year);
 
-  bool operator<(const Date& d);
-  bool operator>(const Date& d);
-  bool operator==(const Date& d);
-  bool operator!=(const Date& d);
+  bool operator<(const Date& d) const;
+  bool operator>(const Date& d) const;
+  bool operator==(const Date& d) const;
+  bool operator!=(const Date& d) const;
 
 private:
   int year;

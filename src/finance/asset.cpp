@@ -9,9 +9,16 @@ void Asset::set_closes(std::vector<close> closes)
   this->sort_closes();
 }
 
-float Asset::get_return(tm* start_date, tm* end_date)
+float Asset::get_return(hlp::Date start_date, hlp::Date end_date)
 {
-  return 0;
+  float v1, v2;
+  for (auto const& close: this->closes) {
+    if (close.date == start_date)
+      v1 = close.value;
+    if (close.date == end_date)
+      v2 = close.value;
+  }
+  return (v2 - v1) / v1;
 }
 
 // sort using a custom function object

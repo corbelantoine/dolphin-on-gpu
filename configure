@@ -1,0 +1,21 @@
+#! /bin/sh
+
+SCRIPT=$(readlink "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+BUILDDIR="$SCRIPTPATH/build"
+
+# Define build mode
+if [ "$1" = "DEBUG" ]; then
+  MODE=DEBUG
+else
+  MODE=RELEASE
+fi
+
+# Clean build
+rm -rf $BUILDDIR
+
+# Create new build directory
+mkdir $BUILDDIR
+
+# Launch cmake
+cd $BUILDDIR && cmake .. -DCMAKE_BUILD_TYPE=$MODE

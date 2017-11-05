@@ -1,12 +1,18 @@
-cmake_minimum_required(VERSION 3.0.2)
-project(Dolphin_GPU CXX)
-set(DOLPHIN_GPU_VERSION 0.1)
+cmake_minimum_required(VERSION 3.8)
+project(dolphin_private)
 
-# direcory variables
-set(SRC_DIR src/)
-# set(DOC_DIR doc/)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR})
+set(CMAKE_CXX_STANDARD 11)
 
-# source directories
-add_subdirectory(${SRC_DIR})
-# add_subdirectory(${DOC_DIR})
+set(SOURCE_FILES
+        lib/json.hpp
+        src/app/main.cc
+        src/finance/asset.cc
+        src/finance/asset.hh
+        src/finance/portfolio.cc
+        src/finance/portfolio.hh
+        src/optimization/optimizer.cc
+        src/optimization/optimizer.hh
+        src/parsing/parse.cc
+        src/parsing/parse.hh)
+
+add_executable(dolphin_private ${SOURCE_FILES})

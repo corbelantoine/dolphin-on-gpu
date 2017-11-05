@@ -1,5 +1,5 @@
 #include <iostream>
-#include "parsing/parse.hh"
+#include "../parsing/parse.hh"
 
 int main(int argc, char* argv[])
 {

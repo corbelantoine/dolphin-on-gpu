@@ -30,8 +30,8 @@ map<int, vector<int>> parse(){
     json j;
     inFile >> j;
 
-    map dico;
+    map<int, vector<int>> dico;
     //dico.insert(pair<int, vector>(135, new vector()));
-    cout << dico;
-    return map;
+    cout << "Hello!!!";
+    return dico;
 }

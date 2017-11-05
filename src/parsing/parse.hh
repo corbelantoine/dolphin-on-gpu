@@ -6,9 +6,11 @@
 #define DOLPHIN_PRIVATE_MAIN_H
 
 
-class main {
+#include <map>
+#include <vector>
+using namespace std;
 
-};
+map<int, vector<int>> parse();
 
 
 #endif //DOLPHIN_PRIVATE_MAIN_H

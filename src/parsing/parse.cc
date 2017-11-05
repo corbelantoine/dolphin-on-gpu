@@ -5,8 +5,8 @@
 #include <fstream>
 #include <printf.h>
 #include <iostream>
-#include "parse.h"
-#include "../lib/json.hpp"
+#include "parse.hh"
+#include "../../lib/json.hpp"
 
 using json = nlohmann::json;
 using namespace std;
@@ -16,7 +16,7 @@ json getData(){
 }
 
 
-void parse(){
+map<int, vector<int>> parse(){
     ifstream inFile;
     string data;
     string x;
@@ -30,10 +30,8 @@ void parse(){
     json j;
     inFile >> j;
 
-
-    for (int i; i < j.size(); i++){
-        cout << j[i][1];
-        //istringstream(.toString()) >> get_time(&t, "%Y-%m-%d");
-        //cout << std::put_time(&t, "%c");
-    }
+    map dico;
+    //dico.insert(pair<int, vector>(135, new vector()));
+    cout << dico;
+    return map;
 }

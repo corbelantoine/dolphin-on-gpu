@@ -1,4 +1,6 @@
 #include "asset.hpp"
+#include <math.h>
+#include <numeric>
 
 namespace fin
 {
@@ -9,7 +11,7 @@ void Asset::set_closes(std::vector<close> closes)
   this->sort_closes();
 }
 
-float Asset::get_return(hlp::Date start_date, hlp::Date end_date)
+float Asset::get_return(hlp::Date start_date, hlp::Date end_date) const
 {
   float v1, v2;
   for (auto const& close: this->closes) {
@@ -19,6 +21,63 @@ float Asset::get_return(hlp::Date start_date, hlp::Date end_date)
       v2 = close.value;
   }
   return (v2 - v1) / v1;
+}
+
+
+std::vector<close> Asset::get_closes() const
+{
+  return this->closes;
+}
+
+std::vector<close> Asset::get_closes(hlp::Date start_date, hlp::Date end_date) const
+{
+  int start, end;
+  for(std::vector<int>::size_type i = 0; i != this->closes.size(); ++i) {
+    if (this->closes[i].date == start_date)
+      start = i;
+    if (this->closes[i].date == end_date) {
+      end = i;
+      continue;
+    }
+  }
+  std::vector<close> closes(this->closes.begin() + start, this->closes.begin() + end);
+  return closes;
+}
+
+
+std::vector<float> Asset::get_returns(hlp::Date start_date, hlp::Date end_date) const
+{
+  struct lambdas {
+   static float ret(const close close1, const close close2)
+   {
+     float v1 = close1.value;
+     float v2 = close2.value;
+     return (v2 - v1) / v1;
+   }
+  };
+
+  std::vector<close> period_closes = this->get_closes(start_date, end_date);
+  // compute all returns on this period
+  std::vector<float> returns (period_closes.size() - 1);
+  std::transform(period_closes.begin(), period_closes.end() - 1,
+                period_closes.begin() + 1, returns.begin(), lambdas::ret);
+  return returns;
+}
+
+float Asset::get_volatility(hlp::Date start_date, hlp::Date end_date) const
+{
+  std::vector<float> returns = this->get_returns(start_date, end_date);
+
+  float avg = std::accumulate(returns.begin(), returns.end(), 0.0) / returns.size();
+
+  float vol = 0;
+  for(auto const& r : returns){
+    vol += pow(r - avg, 2);
+  }
+  vol /= returns.size();
+  vol = sqrtf(vol);
+
+  return vol;
 }
 
 // sort using a custom function object

@@ -10,6 +10,7 @@ class Date
 
 public:
   Date(std::string str_date);
+  Date() = default;
   ~Date() = default;
 
   int get_day() const;
@@ -22,6 +23,8 @@ public:
 
   bool operator<(const Date& d) const;
   bool operator>(const Date& d) const;
+  bool operator<=(const Date& d) const;
+  bool operator>=(const Date& d) const;
   bool operator==(const Date& d) const;
   bool operator!=(const Date& d) const;
 

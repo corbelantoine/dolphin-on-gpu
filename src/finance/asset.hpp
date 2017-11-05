@@ -20,7 +20,14 @@ public:
 
   void set_closes(std::vector<close> closes);
 
-  float get_return(hlp::Date start_date, hlp::Date end_date);
+  std::vector<close> get_closes() const;
+  std::vector<close> get_closes(hlp::Date start_date, hlp::Date end_date) const;
+
+  float get_return(hlp::Date start_date, hlp::Date end_date) const;
+  std::vector<float> get_returns(hlp::Date start_date, hlp::Date end_date) const;
+
+
+  float get_volatility(hlp::Date start_date, hlp::Date end_date) const;
 
 private:
   std::vector<close> closes;

@@ -65,3 +65,36 @@ $$S_a = \frac{E[R_a - R_f]}{\sigma_a}$$
 
 ## Conclusion
 In order to optimize a portfolio $P$ of size $N$ (already specified assets), we need to find the weights $(w_i)_{i \in [[1, N]]}$ that maximizes $R(P)$ and minimizes $\sigma_P$
+
+
+#Implementation
+The first idea was to directly resolve the convexe optimization with all assets.
+However, our convexe optimization algorithm must take into account that
+we can't take more than 20 assets at a time, and that is really hard
+to implement.
+
+To resolve this issue, we chose to compute the best weight for a given portfolio.
+We will then launch this computation on a significant number of portfolio.
+The number of different portfolio we can create from N assets being 20 among N,
+it is in our best interest to launch every computation on a new thread.
+
+To implement this algorithm, we had to clean the data retrived from the API.
+Some information are missing and we had to complete them.
+Also, because we want to reduce the computational time, we chose to compute
+every ratio ourselves, such as the return, the sharp etc...
+That's why we started our work by trying to find the good formula in order
+to compute our ratios the same way the API does.
+This step has been difficult and some formula still need to be found.
+
+We then started to implement the first step of our portfolio optimization.
+First, we had to create a parser in order to use the data stored in our file.
+This parser takes two arguments, a start and an end date. Those dates allow
+us to choose the period of time in which we want to work.
+If any information during this period of time is missing, we simply ignore the
+asset. The parser return a vector of asset containing all data for each valid asset.
+
+## Next step
+We now have to create different portfolio randomly and call our
+optimization computation on them.
+The main challenge here will be to parallelize the execution of each
+optimization.

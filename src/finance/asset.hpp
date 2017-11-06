@@ -15,7 +15,7 @@ struct close
 class Asset
 {
 public:
-  Asset() = default;
+  Asset(int id);
   ~Asset() = default;
 
   void set_closes(std::vector<close> closes);
@@ -30,6 +30,7 @@ public:
   float get_volatility(hlp::Date start_date, hlp::Date end_date) const;
 
 private:
+  int id;
   std::vector<close> closes;
 
   void sort_closes();

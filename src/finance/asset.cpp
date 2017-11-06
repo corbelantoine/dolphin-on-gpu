@@ -1,9 +1,15 @@
 #include "asset.hpp"
+
 #include <math.h>
 #include <numeric>
 
 namespace fin
 {
+
+Asset::Asset(int id)
+{
+  this->id = id;
+}
 
 void Asset::set_closes(std::vector<close> closes)
 {

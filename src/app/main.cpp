@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "../helpers/date.hpp"
+#include "../parsing/parse.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -18,5 +19,12 @@ int main(int argc, char* argv[])
   else
     std::cout << "d1 > d2" << std::endl;
 
+  std::vector<float>* closes = getCloses(hlp::Date::Date("2007-07-01"), hlp::Date::Date("2017-07-01"));
+  if (closes){
+    for (int i = 0; i < closes->size(); i++)
+      std::cout << (*closes)[i] << endl;
+  }
+  else
+    std::cout << "Invalid date" << endl;
   return 0;
 }

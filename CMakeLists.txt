@@ -12,8 +12,8 @@ set(SOURCE_FILES
         src/finance/portfolio.hpp
         src/optimization/optimizer.cpp
         src/optimization/optimizer.hpp
-				src/helpers/date.cpp
-				src/helpers/date.hpp
+		src/helpers/date.cpp
+		src/helpers/date.hpp
         src/parsing/parse.cpp
         src/parsing/parse.hpp)
 

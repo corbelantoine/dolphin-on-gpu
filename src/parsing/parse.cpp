@@ -1,37 +1,43 @@
-//
-// Created by Antoine Corbel on 05/11/2017.
-//
-
 #include <fstream>
-#include <printf.h>
 #include <iostream>
 #include "parse.hpp"
-#include "../../lib/json.hpp"
+
 
 using json = nlohmann::json;
 using namespace std;
 
-json getData(){
+vector<float>* getCloses(hlp::Date start_date, hlp::Date end_date){
+    auto data = parse("data/cleaned/135");
+
+    if (data.size() > 0 && data[0]->first <= start_date && data[data.size() - 1]->first >= end_date){
+        vector<float>* vect = new vector<float>();
+        for (int i = 0; i < data.size(); i++)
+            vect->push_back(data[i]->second);
+        return vect;
+    }
     return NULL;
 }
 
 
-map<int, vector<int>> parse(){
+vector<pair<hlp::Date, float>*> parse(string path){
     ifstream inFile;
     string data;
-    string x;
+    vector<pair<hlp::Date, float>*> vect;
 
-    inFile.open("../data/cleaned/135");
+
+    inFile.open(path);
     if (!inFile) {
         cout << "Unable to open file";
-        exit(1);
+        return vect;
     }
 
     json j;
     inFile >> j;
 
-    map<int, vector<int>> dico;
-    //dico.insert(pair<int, vector>(135, new vector()));
-    cout << "Hello!!!";
-    return dico;
+    for (int i; i < j.size(); i++) {
+        pair<hlp::Date, float> *p = new pair<hlp::Date, float>(hlp::Date::Date(j[i][0].get<string>()), j[i][1]);
+        vect.push_back(p);
+    }
+
+    return vect;
 }

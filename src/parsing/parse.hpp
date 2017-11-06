@@ -10,10 +10,12 @@
 #include <vector>
 #include "../helpers/date.hpp"
 #include "../../lib/json.hpp"
+#include "../finance/asset.hpp"
+
 using namespace std;
 
-vector<float>* getCloses(hlp::Date start_date, hlp::Date end_date);
-vector<pair<hlp::Date, float>*> parse(string path);
+vector<fin::Asset> getAssets(hlp::Date start_date, hlp::Date end_date);
+fin::Asset parse(string path);
 
 
 #endif //DOLPHIN_PRIVATE_PARSE_H

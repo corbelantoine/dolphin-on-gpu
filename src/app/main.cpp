@@ -19,12 +19,14 @@ int main(int argc, char* argv[])
   else
     std::cout << "d1 > d2" << std::endl;
 
-  std::vector<float>* closes = getCloses(hlp::Date::Date("2007-07-01"), hlp::Date::Date("2017-07-01"));
-  if (closes){
-    for (int i = 0; i < closes->size(); i++)
-      std::cout << (*closes)[i] << endl;
-  }
-  else
-    std::cout << "Invalid date" << endl;
+  std::vector<fin::Asset> assets = getAssets(hlp::Date::Date("2008-07-01"), hlp::Date::Date("2016-07-01"));
+  //for (int i = 0; i < assets.size(); i++){
+  //  auto closes = assets[i].get_closes();
+  //  for (int j = 0; j < closes.size(); j++)
+  //    std::cout << closes[j].value << endl;
+  //}
+
+  cout << assets.size() << endl;
+
   return 0;
 }

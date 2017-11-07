@@ -20,7 +20,7 @@ public:
   float get_return(hlp::Date start_date, hlp::Date end_date) const;
   float get_volatility(hlp::Date start_date, hlp::Date end_date) const;
 
-  std::vector<std::vector<float> get_covariance(hlp::Date start_date, hlp::Date end_date) const;
+  std::vector<float> get_covariance(hlp::Date start_date, hlp::Date end_date) const;
 
 private:
   std::vector<(Asset, float)> assets;

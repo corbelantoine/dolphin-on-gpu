@@ -41,7 +41,26 @@ float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
 
 float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const;
 
-std::vector<std::vector<float> Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const;
+std::vector<float> Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const
+{
+  std::vector<float> covariance(this->assets.size() * this->assets.size());
+
+  for (std::size_t i = 0; i != this->assets.size(); ++i)
+    for (std::size_t j = 0; j != this->assets.size(); ++j)
+    {
+      std::vector<float> ri = std::get<0>(this->assets[i]).get_returns(start_date, end_date);
+      std::vector<float> rj = std::get<0>(this->assets[j]).get_returns(start_date, end_date);
+      float ri_avg = std::accumulate(ri.begin(), ri.end(), 0.0) / ri.size();
+      float rj_avg = std::accumulate(rj.begin(), rj.end(), 0.0) / rj.size();
+
+      std::size_t ind = i * this->assets.size() + j;
+      covariance[ind] = 0;
+      for (std::size_t k = 0; k != ri.size(); ++k)
+        covariance[ind] += (ri[k] - ri_avg) * (rj[k] - rj_avg);
+      covariance[ind] /= ri.size();
+    }
+  return covariance;
+}
 
 
 }

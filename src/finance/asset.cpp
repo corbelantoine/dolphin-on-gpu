@@ -38,7 +38,7 @@ std::vector<close> Asset::get_closes() const
 std::vector<close> Asset::get_closes(hlp::Date start_date, hlp::Date end_date) const
 {
   int start, end;
-  for(std::vector<int>::size_type i = 0; i != this->closes.size(); ++i) {
+  for(std::size_t i = 0; i != this->closes.size(); ++i) {
     if (this->closes[i].date == start_date)
       start = i;
     if (this->closes[i].date == end_date) {

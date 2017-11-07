@@ -6,13 +6,15 @@
 
 using json = nlohmann::json;
 
-std::vector<fin::Asset> getAssets(hlp::Date start_date, hlp::Date end_date){
+std::vector<fin::Asset> getAssets(hlp::Date start_date, hlp::Date end_date)
+{
+    std::cout << "Reading all files, this may take some time ..." << std::endl;
     std::vector<fin::Asset> ret;
 
-    DIR *dir;
-    struct dirent *ent;
-    if (dir == opendir("data/cleaned")) {
-        while (ent == readdir(dir)) {
+    DIR *dir = opendir("data/cleaned");
+    if (dir) {
+        struct dirent *ent = readdir(dir);
+        while (ent) {
             if (std::string(ent->d_name).compare(0, 1 , ".")) {
                 auto asset = parse(std::string("data/cleaned/").append(ent->d_name));
                 auto closes = asset.get_closes();
@@ -21,11 +23,12 @@ std::vector<fin::Asset> getAssets(hlp::Date start_date, hlp::Date end_date){
                   && closes[closes.size() - 1].date >= end_date)
                     ret.push_back(asset);
             }
+            ent = readdir(dir);
         }
         closedir (dir);
     } else
-        return ret;
-
+        throw std::invalid_argument("There is no file to read");
+    std::cout << "Done! All files are read and parsed." << std::endl;
     return ret;
 }
 

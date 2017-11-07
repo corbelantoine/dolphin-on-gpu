@@ -10,3 +10,6 @@
 # C++
 build/*
 dolphin
+
+# Data
+data/*

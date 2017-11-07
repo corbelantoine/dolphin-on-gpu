@@ -1,4 +1,4 @@
 set(SRC_PARSING
   parse.cpp)
 
-add_library(app_objs OBJECT ${SRC_PARSING})
+add_library(prs_objs OBJECT ${SRC_PARSING})

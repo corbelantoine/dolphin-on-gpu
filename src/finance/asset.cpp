@@ -53,20 +53,17 @@ std::vector<close> Asset::get_closes(hlp::Date start_date, hlp::Date end_date) c
 
 std::vector<float> Asset::get_returns(hlp::Date start_date, hlp::Date end_date) const
 {
-  struct lambdas {
-   static float ret(const close close1, const close close2)
-   {
-     float v1 = close1.value;
-     float v2 = close2.value;
-     return (v2 - v1) / v1;
-   }
-  };
-
   std::vector<close> period_closes = this->get_closes(start_date, end_date);
   // compute all returns on this period
   std::vector<float> returns (period_closes.size() - 1);
   std::transform(period_closes.begin(), period_closes.end() - 1,
-                period_closes.begin() + 1, returns.begin(), lambdas::ret);
+                 period_closes.begin() + 1, returns.begin(),
+                 [](close c1, close c2) -> float
+                 {
+                   float v1 = c1.value;
+                   float v2 = c2.value;
+                   return (v2 - v1) / v1;
+                 });
   return returns;
 }
 

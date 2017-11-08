@@ -12,8 +12,8 @@ public:
   Portfolio() = default;
   ~Portfolio() = default;
 
-  std::vector<std::tuple<Asset&, float>> get_assets() const;
-  void set_assets(std::vector<std::tuple<Asset&, float>> assets);
+  std::vector<std::tuple<Asset*, float>> get_assets() const;
+  void set_assets(std::vector<std::tuple<Asset*, float>> assets);
 
   float get_return(hlp::Date start_date, hlp::Date end_date) const;
   float get_volatility(hlp::Date start_date, hlp::Date end_date) const;
@@ -21,7 +21,7 @@ public:
   std::vector<float> get_covariance(hlp::Date start_date, hlp::Date end_date) const;
 
 private:
-  std::vector<std::tuple<Asset&, float>> assets;
+  std::vector<std::tuple<Asset*, float>> assets;
 
 };
 

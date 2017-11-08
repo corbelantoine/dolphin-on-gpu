@@ -1,26 +1,63 @@
 #include <iostream>
+#include <algorithm>
 
 #include "../helpers/date.hpp"
 #include "../parsing/parse.hpp"
 #include "../finance/portfolio.hpp"
 
+void print_ret_vol(std::vector<fin::Asset>& assets)
+{
+  for (auto const& asset: assets)
+    std::cout << "return: " << asset.get_return()
+              << ", volatility: " << asset.get_volatility()
+              << std::endl;
+}
+
+void print_ret_vol(fin::Portfolio& p, hlp::Date& start_date, hlp::Date& end_date)
+{
+  std::cout << "return: " << p.get_return(start_date, end_date)
+            << ", volatility: " << p.get_volatility(start_date, end_date)
+            << std::endl;
+}
+
+fin::Portfolio get_random_portfolio(std::vector<fin::Asset>& assets, size_t n = 10)
+{
+  fin::Portfolio p;
+
+  std::vector<std::size_t> tmp(assets.size());
+  size_t k = 0;
+  std::generate(tmp.begin(), tmp.end(), [&k] () { return k++; });
+  std::random_shuffle(tmp.begin(), tmp.end());
+  std::vector<std::size_t> indices(tmp.begin(), tmp.begin() + n);
+
+  for (auto const& i: indices)
+    std::cout << i << ", ";
+  std::cout << std::endl;
+
+  std::vector<std::tuple<fin::Asset*, float>> p_assets(n);
+  for (std::size_t i = 0; i != n; ++i)
+  {
+    float w = 1. / n;
+    std::cout << "w[" << i << "] = " << w << std::endl;
+    std::tuple<fin::Asset*, float> tmp = std::make_tuple(&assets[indices[i]], w);
+    p_assets[i] = tmp;
+  }
+  p.set_assets(p_assets);
+
+  return p;
+}
+
 int main(int argc, char* argv[])
 {
+  hlp::Date d1 = hlp::Date("2008-07-01");
+  hlp::Date d2 = hlp::Date("2016-07-01");
   try {
-    std::vector<fin::Asset> assets = getAssets(hlp::Date("2008-07-01"), hlp::Date("2016-07-01"));
-    for (auto const& asset: assets)
-      std::cout << "return: " << asset.get_return()
-                << ", volatility: " << asset.get_volatility()
-                << std::endl;
+    std::vector<fin::Asset> assets = getAssets(d1, d2);
+    fin::Portfolio p = get_random_portfolio(assets);
+    print_ret_vol(p, d1, d2);
   } catch(const std::exception& e) {
     std::cout << e.what() << std::endl ;
   }
-
-  //for (int i = 0; i < assets.size(); i++){
-  //  auto closes = assets[i].get_closes();
-  //  for (int j = 0; j < closes.size(); j++)
-  //    std::cout << closes[j].value << endl;
-  //}
 
   return 0;
 }

@@ -39,7 +39,7 @@ std::vector<close> Asset::get_closes(hlp::Date start_date, hlp::Date end_date) c
 
 float Asset::get_return() const
 {
-  float v1 = this->closes.front().value;
+  float v1 = this->closes.front ().value;
   float v2 = this->closes.back().value;
   return (v2 - v1) / v1;
 }

@@ -6,7 +6,7 @@
 
 using json = nlohmann::json;
 
-std::vector<fin::Asset> getAssets(hlp::Date start_date, hlp::Date end_date)
+std::vector<fin::Asset> getAssets(hlp::Date& start_date, hlp::Date& end_date)
 {
     std::cout << "Reading all files, this may take some time ..." << std::endl;
     std::vector<fin::Asset> ret;

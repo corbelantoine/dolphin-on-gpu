@@ -3,36 +3,39 @@
 #include <math.h>
 #include <numeric>
 #include <stdexcept>
+#include <iostream>
 
 namespace fin
 {
 
 // void Portfolio::add_asset(Asset *asset, float shares);
 
-std::vector<std::tuple<Asset&, float>> Portfolio::get_assets() const
+std::vector<std::tuple<Asset*, float>> Portfolio::get_assets() const
 {
   return this->assets;
 }
 
-void Portfolio::set_assets(std::vector<std::tuple<Asset&, float>> assets)
+void Portfolio::set_assets(std::vector<std::tuple<Asset*, float>> assets)
 {
   float sum = std::accumulate(assets.begin(), assets.end(), 0.0,
-                              [](float s, std::tuple<Asset&, float> a) -> float {
+                              [](float s, std::tuple<Asset*, float> a) -> float {
                                 return s + std::get<1>(a);
                               });
-  if (sum != 1)
-  {
+
+  std::cout << sum << std::endl;
+  float eps = 0.01;
+  if (sum >= 1 - eps && sum <= 1 + eps)
+    this->assets = assets;
+  else
     throw std::invalid_argument("Weights must sum to 1");
-  }
-  this->assets = assets;
 }
 
 float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
 {
-  std::vector<float> returns;
+  std::vector<float> returns(this->assets.size());
   std::transform(this->assets.begin(), this->assets.end(), returns.begin(),
-                [&start_date, &end_date](std::tuple<Asset&, float> a) -> float {
-                  float ret = std::get<0>(a).get_return(start_date, end_date);
+                [&start_date, &end_date](std::tuple<Asset*, float> a) -> float {
+                  float ret = std::get<0>(a)->get_return(start_date, end_date);
                   float w = std::get<1>(a);
                   return w * ret;
                 });
@@ -60,8 +63,8 @@ std::vector<float> Portfolio::get_covariance(hlp::Date start_date, hlp::Date end
   for (std::size_t i = 0; i != this->assets.size(); ++i)
     for (std::size_t j = 0; j != this->assets.size(); ++j)
     {
-      std::vector<float> ri = std::get<0>(this->assets[i]).get_returns(start_date, end_date);
-      std::vector<float> rj = std::get<0>(this->assets[j]).get_returns(start_date, end_date);
+      std::vector<float> ri = std::get<0>(this->assets[i])->get_returns(start_date, end_date);
+      std::vector<float> rj = std::get<0>(this->assets[j])->get_returns(start_date, end_date);
       float ri_avg = std::accumulate(ri.begin(), ri.end(), 0.0) / ri.size();
       float rj_avg = std::accumulate(rj.begin(), rj.end(), 0.0) / rj.size();
 

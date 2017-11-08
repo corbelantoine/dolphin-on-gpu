@@ -2,6 +2,7 @@
 
 #include "../helpers/date.hpp"
 #include "../parsing/parse.hpp"
+#include "../finance/portfolio.hpp"
 
 int main(int argc, char* argv[])
 {

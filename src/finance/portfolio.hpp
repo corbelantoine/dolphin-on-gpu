@@ -12,8 +12,6 @@ public:
   Portfolio() = default;
   ~Portfolio() = default;
 
-  void add_asset(Asset& asset, float shares);
-
   std::vector<std::tuple<Asset&, float>> get_assets() const;
   void set_assets(std::vector<std::tuple<Asset&, float>> assets);
 

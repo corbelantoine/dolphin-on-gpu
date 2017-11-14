@@ -27,15 +27,18 @@
 #include <math.h>
 #define pm(A, m, n) printmatrix(#A, A, m, n, 1)
 #endif
-typedef struct Params_t {
+
+struct Params {
   double Sigma[400];
   double lambda[1];
   double Returns[20];
-} Params;
-typedef struct Vars_t {
+};
+
+struct Vars {
   double *Weights; /* 20 rows. */
-} Vars;
-typedef struct Workspace_t {
+};
+
+struct Workspace {
   double h[20];
   double s_inv[20];
   double s_inv_z[20];
@@ -62,8 +65,9 @@ typedef struct Workspace_t {
   double block_33[1];
   /* Pre-op symbols. */
   int converged;
-} Workspace;
-typedef struct Settings_t {
+};
+
+struct Settings {
   double resid_tol;
   double eps;
   int max_iters;
@@ -78,49 +82,52 @@ typedef struct Settings_t {
   int debug;
   /* For regularization. Minimum value of abs(D_ii) in the kkt D factor. */
   double kkt_reg;
-} Settings;
-extern Vars vars;
-extern Params params;
-extern Workspace work;
-extern Settings settings;
+};
+
+// extern Vars vars;
+// extern Params params;
+// extern Workspace work;
+// extern Settings settings;
+
+
 /* Function definitions in ldl.c: */
-void ldl_solve(double *target, double *var);
-void ldl_factor(void);
-double check_factorization(void);
-void matrix_multiply(double *result, double *source);
-double check_residual(double *target, double *multiplicand);
-void fill_KKT(void);
+void ldl_solve(double *target, double *var, Workspace& work, Settings& settings);
+void ldl_factor(Workspace& work, Settings& settings);
+double check_factorization(Workspace& work);
+void matrix_multiply(double *result, double *source, Workspace& work, Settings& settings);
+double check_residual(double *target, double *multiplicand, Workspace& work, Settings& settings);
+void fill_KKT(Workspace& work, Params& params);
 
 /* Function definitions in matrix_support.c: */
 void multbymA(double *lhs, double *rhs);
 void multbymAT(double *lhs, double *rhs);
 void multbymG(double *lhs, double *rhs);
 void multbymGT(double *lhs, double *rhs);
-void multbyP(double *lhs, double *rhs);
-void fillq(void);
-void fillh(void);
-void fillb(void);
+void multbyP(double *lhs, double *rhs, Params& params);
+void fillq(Workspace& work, Params& params);
+void fillh(Workspace& work);
+void fillb(Workspace& work);
 void pre_ops(void);
 
 /* Function definitions in solver.c: */
-double eval_gap(void);
-void set_defaults(void);
-void setup_pointers(void);
-void setup_indexing(void);
-void set_start(void);
-double eval_objv(void);
-void fillrhs_aff(void);
-void fillrhs_cc(void);
-void refine(double *target, double *var);
-double calc_ineq_resid_squared(void);
-double calc_eq_resid_squared(void);
-void better_start(void);
-void fillrhs_start(void);
-long solve(void);
+double eval_gap(Workspace& work);
+void set_defaults(Settings& settings);
+void setup_pointers(Workspace& work, Vars& vars);
+void setup_indexing(Workspace& work, Vars& vars);
+void set_start(Workspace& work, Settings& settings);
+double eval_objv(Workspace& work, Params& params);
+void fillrhs_aff(Workspace& work, Params& params);
+void fillrhs_cc(Workspace& work);
+void refine(double *target, double *var, Workspace& work, Settings& settings);
+double calc_ineq_resid_squared(Workspace& work);
+double calc_eq_resid_squared(Workspace& work);
+void better_start(Workspace& work, Settings& settings, Params& params);
+void fillrhs_start(Workspace& work);
+long solve(Workspace& work, Settings& settings, Params& params, Vars& vars);
 
 /* Function definitions in testsolver.c: */
 int main(int argc, char **argv);
-void load_default_data(void);
+void load_default_data(Params& params);
 
 /* Function definitions in util.c: */
 void tic(void);

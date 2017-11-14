@@ -1,15 +1,12 @@
 #pragma once
 
 #include "../finance/portfolio.hpp"
+#include "../../lib/cvxgen/solver.hpp"
 
-extern "C"
-{
-#include "../../lib/cvxgen/solver.h"
-}
-
-namespace opt
-{
+//
+// namespace opt
+// {
 
 void optimize_portfolio(fin::Portfolio& p);
 
-}
+// }

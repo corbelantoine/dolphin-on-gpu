@@ -6,9 +6,9 @@
 
 /* Filename: ldl.c. */
 /* Description: Basic test harness for solver.c. */
-#include "solver.h"
+#include "solver.hpp"
 /* Be sure to place ldl_solve first, so storage schemes are defined by it. */
-void ldl_solve(double *target, double *var) {
+void ldl_solve(double *target, double *var, Workspace& work, Settings& settings) {
   int i;
   /* Find var = (L*diag(work.d)*L') \ target, then unpermute. */
   /* Answer goes into var. */
@@ -204,11 +204,12 @@ void ldl_solve(double *target, double *var) {
   var[60] = work.v[40];
 #ifndef ZERO_LIBRARY_MODE
   if (settings.debug) {
-    printf("Squared norm for solution is %.8g.\n", check_residual(target, var));
+    printf("Squared norm for solution is %.8g.\n", check_residual(target, var, work, settings));
   }
 #endif
 }
-void ldl_factor(void) {
+
+void ldl_factor(Workspace& work, Settings& settings) {
   work.d[0] = work.KKT[0];
   if (work.d[0] < 0)
     work.d[0] = settings.kkt_reg;
@@ -1137,11 +1138,12 @@ void ldl_factor(void) {
   work.d_inv[60] = 1/work.d[60];
 #ifndef ZERO_LIBRARY_MODE
   if (settings.debug) {
-    printf("Squared Frobenius for factorization is %.8g.\n", check_factorization());
+    printf("Squared Frobenius for factorization is %.8g.\n", check_factorization(work));
   }
 #endif
 }
-double check_factorization(void) {
+
+double check_factorization(Workspace& work) {
   /* Returns the squared Frobenius norm of A - L*D*L'. */
   double temp, residual;
   /* Only check the lower triangle. */
@@ -1768,7 +1770,8 @@ double check_factorization(void) {
   residual += temp*temp;
   return residual;
 }
-void matrix_multiply(double *result, double *source) {
+
+void matrix_multiply(double *result, double *source, Workspace& work, Settings& settings) {
   /* Finds result = A*source. */
   result[0] = work.KKT[100]*source[0]+work.KKT[101]*source[1]+work.KKT[102]*source[2]+work.KKT[103]*source[3]+work.KKT[104]*source[4]+work.KKT[105]*source[5]+work.KKT[106]*source[6]+work.KKT[107]*source[7]+work.KKT[108]*source[8]+work.KKT[109]*source[9]+work.KKT[110]*source[10]+work.KKT[111]*source[11]+work.KKT[112]*source[12]+work.KKT[113]*source[13]+work.KKT[114]*source[14]+work.KKT[115]*source[15]+work.KKT[116]*source[16]+work.KKT[117]*source[17]+work.KKT[118]*source[18]+work.KKT[119]*source[19]+work.KKT[41]*source[40]+work.KKT[80]*source[60];
   result[1] = work.KKT[101]*source[0]+work.KKT[120]*source[1]+work.KKT[121]*source[2]+work.KKT[122]*source[3]+work.KKT[123]*source[4]+work.KKT[124]*source[5]+work.KKT[125]*source[6]+work.KKT[126]*source[7]+work.KKT[127]*source[8]+work.KKT[128]*source[9]+work.KKT[129]*source[10]+work.KKT[130]*source[11]+work.KKT[131]*source[12]+work.KKT[132]*source[13]+work.KKT[133]*source[14]+work.KKT[134]*source[15]+work.KKT[135]*source[16]+work.KKT[136]*source[17]+work.KKT[137]*source[18]+work.KKT[138]*source[19]+work.KKT[43]*source[41]+work.KKT[81]*source[60];
@@ -1832,19 +1835,20 @@ void matrix_multiply(double *result, double *source) {
   result[59] = work.KKT[39]*source[39]+work.KKT[78]*source[59]+work.KKT[79]*source[19];
   result[60] = work.KKT[80]*source[0]+work.KKT[81]*source[1]+work.KKT[82]*source[2]+work.KKT[83]*source[3]+work.KKT[84]*source[4]+work.KKT[85]*source[5]+work.KKT[86]*source[6]+work.KKT[87]*source[7]+work.KKT[88]*source[8]+work.KKT[89]*source[9]+work.KKT[90]*source[10]+work.KKT[91]*source[11]+work.KKT[92]*source[12]+work.KKT[93]*source[13]+work.KKT[94]*source[14]+work.KKT[95]*source[15]+work.KKT[96]*source[16]+work.KKT[97]*source[17]+work.KKT[98]*source[18]+work.KKT[99]*source[19];
 }
-double check_residual(double *target, double *multiplicand) {
+
+double check_residual(double *target, double *multiplicand, Workspace& work, Settings& settings) {
   /* Returns the squared 2-norm of lhs - A*rhs. */
   /* Reuses v to find the residual. */
   int i;
   double residual;
   residual = 0;
-  matrix_multiply(work.v, multiplicand);
+  matrix_multiply(work.v, multiplicand, work, settings);
   for (i = 0; i < 20; i++) {
     residual += (target[i] - work.v[i])*(target[i] - work.v[i]);
   }
   return residual;
 }
-void fill_KKT(void) {
+void fill_KKT(Workspace& work, Params& params) {
   work.KKT[100] = 2*params.Sigma[0];
   work.KKT[101] = 2*params.Sigma[20];
   work.KKT[102] = 2*params.Sigma[40];

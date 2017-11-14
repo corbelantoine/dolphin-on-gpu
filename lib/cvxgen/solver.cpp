@@ -6,16 +6,18 @@
 
 /* Filename: solver.c. */
 /* Description: Main solver file. */
-#include "solver.h"
-double eval_gap(void) {
+#include "solver.hpp"
+
+double eval_gap(Workspace& work) {
   int i;
   double gap;
   gap = 0;
   for (i = 0; i < 20; i++)
-    gap += work.z[i]*work.s[i];
+    gap += work.z[i] * work.s[i];
   return gap;
 }
-void set_defaults(void) {
+
+void set_defaults(Settings& settings) {
   settings.resid_tol = 1e-6;
   settings.eps = 1e-4;
   settings.max_iters = 25;
@@ -28,16 +30,18 @@ void set_defaults(void) {
   settings.better_start = 1;
   settings.kkt_reg = 1e-7;
 }
-void setup_pointers(void) {
+void setup_pointers(Workspace& work, Vars& vars) {
   work.y = work.x + 20;
   work.s = work.x + 21;
   work.z = work.x + 41;
   vars.Weights = work.x + 0;
 }
-void setup_indexing(void) {
-  setup_pointers();
+
+void setup_indexing(Workspace& work, Vars& vars) {
+  setup_pointers(work, vars);
 }
-void set_start(void) {
+
+void set_start(Workspace& work, Settings& settings) {
   int i;
   for (i = 0; i < 20; i++)
     work.x[i] = 0;
@@ -48,21 +52,23 @@ void set_start(void) {
   for (i = 0; i < 20; i++)
     work.z[i] = settings.z_init;
 }
-double eval_objv(void) {
+
+double eval_objv(Workspace& work, Params& params) {
   int i;
   double objv;
   /* Borrow space in work.rhs. */
-  multbyP(work.rhs, work.x);
+  multbyP(work.rhs, work.x, params);
   objv = 0;
   for (i = 0; i < 20; i++)
-    objv += work.x[i]*work.rhs[i];
+    objv += work.x[i] * work.rhs[i];
   objv *= 0.5;
   for (i = 0; i < 20; i++)
-    objv += work.q[i]*work.x[i];
+    objv += work.q[i] * work.x[i];
   objv += 0;
   return objv;
 }
-void fillrhs_aff(void) {
+
+void fillrhs_aff(Workspace& work, Params& params) {
   int i;
   double *r1, *r2, *r3, *r4;
   r1 = work.rhs;
@@ -74,7 +80,7 @@ void fillrhs_aff(void) {
   multbymGT(work.buffer, work.z);
   for (i = 0; i < 20; i++)
     r1[i] += work.buffer[i];
-  multbyP(work.buffer, work.x);
+  multbyP(work.buffer, work.x, params);
   for (i = 0; i < 20; i++)
     r1[i] -= work.buffer[i] + work.q[i];
   /* r2 = -z. */
@@ -89,7 +95,8 @@ void fillrhs_aff(void) {
   for (i = 0; i < 1; i++)
     r4[i] += work.b[i];
 }
-void fillrhs_cc(void) {
+
+void fillrhs_cc(Workspace& work) {
   int i;
   double *r2;
   double *ds_aff, *dz_aff;
@@ -135,14 +142,15 @@ void fillrhs_cc(void) {
   for (i = 0; i < 20; i++)
     r2[i] = work.s_inv[i]*(smu - ds_aff[i]*dz_aff[i]);
 }
-void refine(double *target, double *var) {
+
+void refine(double *target, double *var, Workspace& work, Settings& settings) {
   int i, j;
   double *residual = work.buffer;
   double norm2;
   double *new_var = work.buffer2;
   for (j = 0; j < settings.refine_steps; j++) {
     norm2 = 0;
-    matrix_multiply(residual, var);
+    matrix_multiply(residual, var, work, settings);
     for (i = 0; i < 61; i++) {
       residual[i] = residual[i] - target[i];
       norm2 += residual[i]*residual[i];
@@ -156,7 +164,7 @@ void refine(double *target, double *var) {
     }
 #endif
     /* Solve to find new_var = KKT \ (target - A*var). */
-    ldl_solve(residual, new_var);
+    ldl_solve(residual, new_var, work, settings);
     /* Update var += new_var, or var += KKT \ (target - A*var). */
     for (i = 0; i < 61; i++) {
       var[i] -= new_var[i];
@@ -167,10 +175,10 @@ void refine(double *target, double *var) {
     /* Check the residual once more, but only if we're reporting it, since */
     /* it's expensive. */
     norm2 = 0;
-    matrix_multiply(residual, var);
+    matrix_multiply(residual, var, work, settings);
     for (i = 0; i < 61; i++) {
       residual[i] = residual[i] - target[i];
-      norm2 += residual[i]*residual[i];
+      norm2 += residual[i] * residual[i];
     }
     if (j == 0)
       printf("Initial residual before refinement has norm squared %.6g.\n", norm2);
@@ -179,7 +187,8 @@ void refine(double *target, double *var) {
   }
 #endif
 }
-double calc_ineq_resid_squared(void) {
+
+double calc_ineq_resid_squared(Workspace& work) {
   /* Calculates the norm ||-Gx - s + h||. */
   double norm2_squared;
   int i;
@@ -194,7 +203,8 @@ double calc_ineq_resid_squared(void) {
     norm2_squared += work.buffer[i]*work.buffer[i];
   return norm2_squared;
 }
-double calc_eq_resid_squared(void) {
+
+double calc_eq_resid_squared(Workspace& work) {
   /* Calculates the norm ||-Ax + b||. */
   double norm2_squared;
   int i;
@@ -209,7 +219,8 @@ double calc_eq_resid_squared(void) {
     norm2_squared += work.buffer[i]*work.buffer[i];
   return norm2_squared;
 }
-void better_start(void) {
+
+void better_start(Workspace& work, Settings& settings, Params& params) {
   /* Calculates a better starting point, using a similar approach to CVXOPT. */
   /* Not yet speed optimized. */
   int i;
@@ -219,11 +230,11 @@ void better_start(void) {
   /* Make sure sinvz is 1 to make hijacked KKT system ok. */
   for (i = 0; i < 20; i++)
     work.s_inv_z[i] = 1;
-  fill_KKT();
-  ldl_factor();
-  fillrhs_start();
+  fill_KKT(work, params);
+  ldl_factor(work, settings);
+  fillrhs_start(work);
   /* Borrow work.lhs_aff for the solution. */
-  ldl_solve(work.rhs, work.lhs_aff);
+  ldl_solve(work.rhs, work.lhs_aff, work, settings);
   /* Don't do any refinement for now. Precision doesn't matter too much. */
   x = work.lhs_aff;
   s = work.lhs_aff + 20;
@@ -263,7 +274,8 @@ void better_start(void) {
       work.z[i] = z[i] + alpha;
   }
 }
-void fillrhs_start(void) {
+
+void fillrhs_start(Workspace& work) {
   /* Fill rhs with (-q, 0, h, b). */
   int i;
   double *r1, *r2, *r3, *r4;
@@ -280,42 +292,43 @@ void fillrhs_start(void) {
   for (i = 0; i < 1; i++)
     r4[i] = work.b[i];
 }
-long solve(void) {
+
+long solve(Workspace& work, Settings& settings, Params& params, Vars& vars) {
   int i;
   int iter;
   double *dx, *ds, *dy, *dz;
   double minval;
   double alpha;
   work.converged = 0;
-  setup_pointers();
+  setup_pointers(work, vars);
   pre_ops();
 #ifndef ZERO_LIBRARY_MODE
   if (settings.verbose)
     printf("iter     objv        gap       |Ax-b|    |Gx+s-h|    step\n");
 #endif
-  fillq();
-  fillh();
-  fillb();
+  fillq(work, params);
+  fillh(work);
+  fillb(work);
   if (settings.better_start)
-    better_start();
+    better_start(work, settings, params);
   else
-    set_start();
+    set_start(work, settings);
   for (iter = 0; iter < settings.max_iters; iter++) {
     for (i = 0; i < 20; i++) {
       work.s_inv[i] = 1.0 / work.s[i];
       work.s_inv_z[i] = work.s_inv[i]*work.z[i];
     }
     work.block_33[0] = 0;
-    fill_KKT();
-    ldl_factor();
+    fill_KKT(work, params);
+    ldl_factor(work, settings);
     /* Affine scaling directions. */
-    fillrhs_aff();
-    ldl_solve(work.rhs, work.lhs_aff);
-    refine(work.rhs, work.lhs_aff);
+    fillrhs_aff(work, params);
+    ldl_solve(work.rhs, work.lhs_aff, work, settings);
+    refine(work.rhs, work.lhs_aff, work, settings);
     /* Centering plus corrector directions. */
-    fillrhs_cc();
-    ldl_solve(work.rhs, work.lhs_cc);
-    refine(work.rhs, work.lhs_cc);
+    fillrhs_cc(work);
+    ldl_solve(work.rhs, work.lhs_cc, work, settings);
+    refine(work.rhs, work.lhs_cc, work, settings);
     /* Add the two together and store in aff. */
     for (i = 0; i < 61; i++)
       work.lhs_aff[i] += work.lhs_cc[i];
@@ -346,12 +359,12 @@ long solve(void) {
       work.z[i] += alpha*dz[i];
     for (i = 0; i < 1; i++)
       work.y[i] += alpha*dy[i];
-    work.gap = eval_gap();
-    work.eq_resid_squared = calc_eq_resid_squared();
-    work.ineq_resid_squared = calc_ineq_resid_squared();
+    work.gap = eval_gap(work);
+    work.eq_resid_squared = calc_eq_resid_squared(work);
+    work.ineq_resid_squared = calc_ineq_resid_squared(work);
 #ifndef ZERO_LIBRARY_MODE
     if (settings.verbose) {
-      work.optval = eval_objv();
+      work.optval = eval_objv(work, params);
       printf("%3d   %10.3e  %9.2e  %9.2e  %9.2e  % 6.4f\n",
           iter+1, work.optval, work.gap, sqrt(work.eq_resid_squared),
           sqrt(work.ineq_resid_squared), alpha);
@@ -359,12 +372,12 @@ long solve(void) {
 #endif
     /* Test termination conditions. Requires optimality, and satisfied */
     /* constraints. */
-    if (   (work.gap < settings.eps)
+    if ((work.gap < settings.eps)
         && (work.eq_resid_squared <= settings.resid_tol*settings.resid_tol)
         && (work.ineq_resid_squared <= settings.resid_tol*settings.resid_tol)
        ) {
       work.converged = 1;
-      work.optval = eval_objv();
+      work.optval = eval_objv(work, params);
       return iter+1;
     }
   }

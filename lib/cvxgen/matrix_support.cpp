@@ -6,10 +6,12 @@
 
 /* Filename: matrix_support.c. */
 /* Description: Support functions for matrix multiplication and vector filling. */
-#include "solver.h"
+#include "solver.hpp"
+
 void multbymA(double *lhs, double *rhs) {
   lhs[0] = -rhs[0]*(1)-rhs[1]*(1)-rhs[2]*(1)-rhs[3]*(1)-rhs[4]*(1)-rhs[5]*(1)-rhs[6]*(1)-rhs[7]*(1)-rhs[8]*(1)-rhs[9]*(1)-rhs[10]*(1)-rhs[11]*(1)-rhs[12]*(1)-rhs[13]*(1)-rhs[14]*(1)-rhs[15]*(1)-rhs[16]*(1)-rhs[17]*(1)-rhs[18]*(1)-rhs[19]*(1);
 }
+
 void multbymAT(double *lhs, double *rhs) {
   lhs[0] = -rhs[0]*(1);
   lhs[1] = -rhs[0]*(1);
@@ -32,6 +34,7 @@ void multbymAT(double *lhs, double *rhs) {
   lhs[18] = -rhs[0]*(1);
   lhs[19] = -rhs[0]*(1);
 }
+
 void multbymG(double *lhs, double *rhs) {
   lhs[0] = -rhs[0]*(-1);
   lhs[1] = -rhs[1]*(-1);
@@ -54,6 +57,7 @@ void multbymG(double *lhs, double *rhs) {
   lhs[18] = -rhs[18]*(-1);
   lhs[19] = -rhs[19]*(-1);
 }
+
 void multbymGT(double *lhs, double *rhs) {
   lhs[0] = -rhs[0]*(-1);
   lhs[1] = -rhs[1]*(-1);
@@ -76,7 +80,8 @@ void multbymGT(double *lhs, double *rhs) {
   lhs[18] = -rhs[18]*(-1);
   lhs[19] = -rhs[19]*(-1);
 }
-void multbyP(double *lhs, double *rhs) {
+
+void multbyP(double *lhs, double *rhs, Params& params) {
   /* TODO use the fact that P is symmetric? */
   /* TODO check doubling / half factor etc. */
   lhs[0] = rhs[0]*(2*params.Sigma[0])+rhs[1]*(2*params.Sigma[20])+rhs[2]*(2*params.Sigma[40])+rhs[3]*(2*params.Sigma[60])+rhs[4]*(2*params.Sigma[80])+rhs[5]*(2*params.Sigma[100])+rhs[6]*(2*params.Sigma[120])+rhs[7]*(2*params.Sigma[140])+rhs[8]*(2*params.Sigma[160])+rhs[9]*(2*params.Sigma[180])+rhs[10]*(2*params.Sigma[200])+rhs[11]*(2*params.Sigma[220])+rhs[12]*(2*params.Sigma[240])+rhs[13]*(2*params.Sigma[260])+rhs[14]*(2*params.Sigma[280])+rhs[15]*(2*params.Sigma[300])+rhs[16]*(2*params.Sigma[320])+rhs[17]*(2*params.Sigma[340])+rhs[18]*(2*params.Sigma[360])+rhs[19]*(2*params.Sigma[380]);
@@ -100,7 +105,8 @@ void multbyP(double *lhs, double *rhs) {
   lhs[18] = rhs[0]*(2*params.Sigma[18])+rhs[1]*(2*params.Sigma[38])+rhs[2]*(2*params.Sigma[58])+rhs[3]*(2*params.Sigma[78])+rhs[4]*(2*params.Sigma[98])+rhs[5]*(2*params.Sigma[118])+rhs[6]*(2*params.Sigma[138])+rhs[7]*(2*params.Sigma[158])+rhs[8]*(2*params.Sigma[178])+rhs[9]*(2*params.Sigma[198])+rhs[10]*(2*params.Sigma[218])+rhs[11]*(2*params.Sigma[238])+rhs[12]*(2*params.Sigma[258])+rhs[13]*(2*params.Sigma[278])+rhs[14]*(2*params.Sigma[298])+rhs[15]*(2*params.Sigma[318])+rhs[16]*(2*params.Sigma[338])+rhs[17]*(2*params.Sigma[358])+rhs[18]*(2*params.Sigma[378])+rhs[19]*(2*params.Sigma[398]);
   lhs[19] = rhs[0]*(2*params.Sigma[19])+rhs[1]*(2*params.Sigma[39])+rhs[2]*(2*params.Sigma[59])+rhs[3]*(2*params.Sigma[79])+rhs[4]*(2*params.Sigma[99])+rhs[5]*(2*params.Sigma[119])+rhs[6]*(2*params.Sigma[139])+rhs[7]*(2*params.Sigma[159])+rhs[8]*(2*params.Sigma[179])+rhs[9]*(2*params.Sigma[199])+rhs[10]*(2*params.Sigma[219])+rhs[11]*(2*params.Sigma[239])+rhs[12]*(2*params.Sigma[259])+rhs[13]*(2*params.Sigma[279])+rhs[14]*(2*params.Sigma[299])+rhs[15]*(2*params.Sigma[319])+rhs[16]*(2*params.Sigma[339])+rhs[17]*(2*params.Sigma[359])+rhs[18]*(2*params.Sigma[379])+rhs[19]*(2*params.Sigma[399]);
 }
-void fillq(void) {
+
+void fillq(Workspace& work, Params& params) {
   work.q[0] = -params.lambda[0]*params.Returns[0];
   work.q[1] = -params.lambda[0]*params.Returns[1];
   work.q[2] = -params.lambda[0]*params.Returns[2];
@@ -122,7 +128,8 @@ void fillq(void) {
   work.q[18] = -params.lambda[0]*params.Returns[18];
   work.q[19] = -params.lambda[0]*params.Returns[19];
 }
-void fillh(void) {
+
+void fillh(Workspace& work) {
   work.h[0] = 0;
   work.h[1] = 0;
   work.h[2] = 0;
@@ -144,8 +151,10 @@ void fillh(void) {
   work.h[18] = 0;
   work.h[19] = 0;
 }
-void fillb(void) {
+
+void fillb(Workspace& work) {
   work.b[0] = 1;
 }
+
 void pre_ops(void) {
 }

@@ -31,15 +31,10 @@ fin::Portfolio get_random_portfolio(std::vector<fin::Asset>& assets, size_t n = 
   std::random_shuffle(tmp.begin(), tmp.end());
   std::vector<std::size_t> indices(tmp.begin(), tmp.begin() + n);
 
-  for (auto const& i: indices)
-    std::cout << i << ", ";
-  std::cout << std::endl;
-
   std::vector<std::tuple<fin::Asset*, float>> p_assets(n);
   for (std::size_t i = 0; i != n; ++i)
   {
     float w = 1. / n;
-    std::cout << "w[" << i << "] = " << w << std::endl;
     std::tuple<fin::Asset*, float> tmp = std::make_tuple(&assets[indices[i]], w);
     p_assets[i] = tmp;
   }
@@ -56,7 +51,8 @@ int main(int argc, char* argv[])
     std::vector<fin::Asset> assets = getAssets(d1, d2);
     fin::Portfolio p = get_random_portfolio(assets, 20);
     print_ret_vol(p, d1, d2);
-    opt::optimize_portfolio(p);
+    // opt::optimize_portfolio(p);
+    optimize_portfolio(p);
     print_ret_vol(p, d1, d2);
   } catch(const std::exception& e) {
     std::cout << e.what() << std::endl ;

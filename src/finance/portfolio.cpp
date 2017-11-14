@@ -53,16 +53,6 @@ std::vector<float> Portfolio::get_returns(hlp::Date start_date, hlp::Date end_da
   return returns;
 }
 
-std::vector<float> Portfolio::get_returns() const
-{
-  std::vector<float> returns(this->assets.size());
-  std::transform(this->assets.begin(), this->assets.end(), returns.begin(),
-                [](std::tuple<Asset*, float> a) -> float {
-                  return std::get<0>(a)->get_return();
-                });
-  return returns;
-}
-
 float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
 {
   std::vector<float> returns(this->assets.size());
@@ -75,36 +65,10 @@ float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
   return std::accumulate(returns.begin(), returns.end(), 0.0);
 }
 
-float Portfolio::get_return() const
-{
-  std::vector<float> returns(this->assets.size());
-  std::transform(this->assets.begin(), this->assets.end(), returns.begin(),
-                [](std::tuple<Asset*, float> a) -> float {
-                  float ret = std::get<0>(a)->get_return();
-                  float w = std::get<1>(a);
-                  return w * ret;
-                });
-  return std::accumulate(returns.begin(), returns.end(), 0.0);
-}
-
 float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const
 {
   float vol = 0;
   std::vector<float> cov = this->get_covariance(start_date, end_date);
-  for (std::size_t i = 0; i != this->assets.size(); ++i)
-    for (std::size_t j = 0; j != this->assets.size(); ++j)
-    {
-      float wi = std::get<1>(this->assets[i]);
-      float wj = std::get<1>(this->assets[j]);
-      vol += wi * wj * cov[i * this->assets.size() + j];
-    }
-  return sqrtf(vol);
-}
-
-float Portfolio::get_volatility() const
-{
-  float vol = 0;
-  std::vector<float> cov = this->get_covariance();
   for (std::size_t i = 0; i != this->assets.size(); ++i)
     for (std::size_t j = 0; j != this->assets.size(); ++j)
     {
@@ -138,30 +102,5 @@ std::vector<float> Portfolio::get_covariance(hlp::Date start_date, hlp::Date end
     }
   return covariance;
 }
-
-std::vector<float> Portfolio::get_covariance() const
-{
-  std::vector<float> covariance(this->assets.size() * this->assets.size());
-
-  for (std::size_t i = 0; i != this->assets.size(); ++i)
-    for (std::size_t j = 0; j != this->assets.size(); ++j)
-    {
-      if (j < i)
-        covariance[i * this->assets.size() + j] = covariance[j * this->assets.size() + i];
-      else {
-        std::vector<float> ri = std::get<0>(this->assets[i])->get_returns();
-        std::vector<float> rj = std::get<0>(this->assets[j])->get_returns();
-        float ri_avg = std::accumulate(ri.begin(), ri.end(), 0.0) / ri.size();
-        float rj_avg = std::accumulate(rj.begin(), rj.end(), 0.0) / rj.size();
-
-        covariance[i * this->assets.size() + j] = 0;
-        for (std::size_t k = 0; k != ri.size(); ++k)
-          covariance[i * this->assets.size() + j] += (ri[k] - ri_avg) * (rj[k] - rj_avg);
-        covariance[i * this->assets.size() + j] /= ri.size();
-      }
-    }
-  return covariance;
-}
-
 
 }

@@ -47,13 +47,20 @@ int main(int argc, char* argv[])
 {
   hlp::Date d1 = hlp::Date("2008-07-01");
   hlp::Date d2 = hlp::Date("2016-07-01");
+
+  hlp::Date d3 = hlp::Date("2010-07-01");
+  hlp::Date d4 = hlp::Date("2010-08-01");
+
   try {
-    std::vector<fin::Asset> assets = getAssets(d1, d2);
+    std::vector<fin::Asset> assets = getAssets(d3, d4);
+    std::cout << "Getting random portfolio\n";
     fin::Portfolio p = get_random_portfolio(assets, 20);
-    print_ret_vol(p, d1, d2);
-    // opt::optimize_portfolio(p);
-    optimize_portfolio(p);
-    print_ret_vol(p, d1, d2);
+
+    std::cout << "before optimization:\n";
+    print_ret_vol(p, d3, d4);
+    optimize_portfolio(p, d3, d4);
+    std::cout << "after optimization:\n";
+    print_ret_vol(p, d3, d4);
   } catch(const std::exception& e) {
     std::cout << e.what() << std::endl ;
   }

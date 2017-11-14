@@ -3,7 +3,15 @@
 // namespace opt
 // {
 
-void optimize_portfolio(fin::Portfolio& p)
+void print_cov(std::vector<float> cov, int n = 20) {
+  for (std::size_t i = 0; i != n; ++i){
+    for (std::size_t j = 0; j != n; ++j)
+      std::cout <<cov[i * n + j] << " ";
+    std::cout << std::endl;
+  }
+}
+
+void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2, int verbose)
 {
   Workspace work;
   Settings settings;
@@ -14,30 +22,19 @@ void optimize_portfolio(fin::Portfolio& p)
   set_defaults(settings);
   setup_indexing(work, vars);
 
-  std::vector<float> cov = p.get_covariance();
+  std::vector<float> cov = p.get_covariance(d1, d2);
   for (std::size_t i = 0; i != cov.size(); ++i)
     params.Sigma[i] = cov[i];
 
-  std::vector<float> returns = p.get_returns();
+  std::vector<float> returns = p.get_returns(d1, d2);
   for (std::size_t i = 0; i != returns.size(); ++i)
     params.Returns[i] = returns[i];
 
-  for (std::size_t i = 0; i != returns.size(); ++i){
-    for (std::size_t j = 0; j != returns.size(); ++j)
-      std::cout <<cov[i * returns.size() + j] << " ";
-    std::cout << std::endl;
-  }
-
-  // for (std::size_t i = 0; i != returns.size(); ++i)
-  //   for (std::size_t j = 0; j != returns.size(); ++j)
-  //     params.Sigma[j * returns.size() + i] = cov[i * returns.size() + j];
-
-
-  params.lambda[0] = 0.1;
+  params.lambda[0] = 0.8;
 
 
   /* Solve problem instance for the record. */
-  settings.verbose = 1;
+  settings.verbose = verbose;
   num_iters = solve(work, settings, params, vars);
 
   std::vector<float> weights(20);

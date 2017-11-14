@@ -7,6 +7,6 @@
 // namespace opt
 // {
 
-void optimize_portfolio(fin::Portfolio& p);
+void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2, int verbose = 0);
 
 // }

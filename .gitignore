@@ -7,6 +7,9 @@
 # Python
 .ipynb_checkpoints/
 
+# C objects
+*.o
+
 # C++
 build/*
 dolphin

@@ -3,7 +3,14 @@ project(dolphin_private)
 
 set(CMAKE_CXX_STANDARD 14)
 
+SET(GCC_COVERAGE_LINK_FLAGS "-lm")
+
 set(SOURCE_FILES
+        lib/cvxgen/ldl.c
+        lib/cvxgen/matrix_support.c
+        lib/cvxgen/solver.h
+        lib/cvxgen/solver.c
+        lib/cvxgen/util.c
         lib/json.hpp
         src/app/main.cpp
         src/finance/asset.cpp

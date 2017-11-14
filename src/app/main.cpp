@@ -4,6 +4,7 @@
 #include "../helpers/date.hpp"
 #include "../parsing/parse.hpp"
 #include "../finance/portfolio.hpp"
+#include "../optimization/optimizer.hpp"
 
 void print_ret_vol(std::vector<fin::Asset>& assets)
 {
@@ -53,7 +54,9 @@ int main(int argc, char* argv[])
   hlp::Date d2 = hlp::Date("2016-07-01");
   try {
     std::vector<fin::Asset> assets = getAssets(d1, d2);
-    fin::Portfolio p = get_random_portfolio(assets);
+    fin::Portfolio p = get_random_portfolio(assets, 20);
+    print_ret_vol(p, d1, d2);
+    opt::optimize_portfolio(p);
     print_ret_vol(p, d1, d2);
   } catch(const std::exception& e) {
     std::cout << e.what() << std::endl ;

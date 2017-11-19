@@ -65,20 +65,6 @@ float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
   return std::accumulate(returns.begin(), returns.end(), 0.0);
 }
 
-float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const
-{
-  float vol = 0;
-  std::vector<float> cov = this->get_covariance(start_date, end_date);
-  for (std::size_t i = 0; i != this->assets.size(); ++i)
-    for (std::size_t j = 0; j != this->assets.size(); ++j)
-    {
-      float wi = std::get<1>(this->assets[i]);
-      float wj = std::get<1>(this->assets[j]);
-      vol += wi * wj * cov[i * this->assets.size() + j];
-    }
-  return sqrtf(vol);
-}
-
 std::vector<float> Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const
 {
   std::vector<float> covariance(this->assets.size() * this->assets.size());
@@ -101,6 +87,27 @@ std::vector<float> Portfolio::get_covariance(hlp::Date start_date, hlp::Date end
       }
     }
   return covariance;
+}
+
+float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const
+{
+  float vol = 0;
+  std::vector<float> cov = this->get_covariance(start_date, end_date);
+  for (std::size_t i = 0; i != this->assets.size(); ++i)
+    for (std::size_t j = 0; j != this->assets.size(); ++j)
+    {
+      float wi = std::get<1>(this->assets[i]);
+      float wj = std::get<1>(this->assets[j]);
+      vol += wi * wj * cov[i * this->assets.size() + j];
+    }
+  return sqrtf(vol);
+}
+
+float get_sharp(hlp::Date start_date, hlp::Date end_date) const
+{
+  float ret = this->get_return(start_date, end_date);
+  float vol = this->get_volatility(start_date, end_date);
+  return ret / vol;
 }
 
 }

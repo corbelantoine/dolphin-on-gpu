@@ -1,4 +1,4 @@
-set(SRC_OPTIMIZATION
-  optimizer.cpp)
+set(SRC_OPT
+  optimizer.cpp))
 
-add_library(opt_objs OBJECT ${SRC_OPTIMIZATION})
+add_library(app_objs OBJECT ${SRC_OPT})

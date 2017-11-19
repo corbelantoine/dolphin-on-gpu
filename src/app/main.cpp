@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
     std::cout << "before optimization:\n";
     print_ret_vol(p, d3, d4);
-    optimize_portfolio(p, d3, d4);
+    opt::optimize_portfolio(p, d3, d4);
     std::cout << "after optimization:\n";
     print_ret_vol(p, d3, d4);
   } catch(const std::exception& e) {

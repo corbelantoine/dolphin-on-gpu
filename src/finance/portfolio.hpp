@@ -24,6 +24,8 @@ public:
 
   float get_volatility(hlp::Date start_date, hlp::Date end_date) const;
 
+  float get_sharp(hlp::Date start_date, hlp::Date end_date) const;
+
 private:
   std::vector<std::tuple<Asset*, float>> assets;
 

@@ -26,6 +26,8 @@ public:
 
   float get_sharp(hlp::Date start_date, hlp::Date end_date) const;
 
+  void print_weights() const;
+
 private:
   std::vector<std::tuple<Asset*, float>> assets;
 

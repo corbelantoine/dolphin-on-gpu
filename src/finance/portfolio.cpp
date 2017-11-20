@@ -103,11 +103,21 @@ float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const
   return sqrtf(vol);
 }
 
-float get_sharp(hlp::Date start_date, hlp::Date end_date) const
+float Portfolio::get_sharp(hlp::Date start_date, hlp::Date end_date) const
 {
   float ret = this->get_return(start_date, end_date);
   float vol = this->get_volatility(start_date, end_date);
   return ret / vol;
+}
+
+void Portfolio::print_weights() const
+{
+  int size = this->assets.size();
+  for (int i = 0; i < size; ++i) {
+    float w = std::get<1>(this->assets[i]);
+    std::cout << w << "  ";
+  }
+  std::cout << std::endl;
 }
 
 }

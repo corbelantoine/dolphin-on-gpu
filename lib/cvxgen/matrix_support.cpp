@@ -13,72 +13,18 @@ void multbymA(double *lhs, double *rhs) {
 }
 
 void multbymAT(double *lhs, double *rhs) {
-  lhs[0] = -rhs[0]*(1);
-  lhs[1] = -rhs[0]*(1);
-  lhs[2] = -rhs[0]*(1);
-  lhs[3] = -rhs[0]*(1);
-  lhs[4] = -rhs[0]*(1);
-  lhs[5] = -rhs[0]*(1);
-  lhs[6] = -rhs[0]*(1);
-  lhs[7] = -rhs[0]*(1);
-  lhs[8] = -rhs[0]*(1);
-  lhs[9] = -rhs[0]*(1);
-  lhs[10] = -rhs[0]*(1);
-  lhs[11] = -rhs[0]*(1);
-  lhs[12] = -rhs[0]*(1);
-  lhs[13] = -rhs[0]*(1);
-  lhs[14] = -rhs[0]*(1);
-  lhs[15] = -rhs[0]*(1);
-  lhs[16] = -rhs[0]*(1);
-  lhs[17] = -rhs[0]*(1);
-  lhs[18] = -rhs[0]*(1);
-  lhs[19] = -rhs[0]*(1);
+  for (int i = 0; i < 20; ++i)
+    lhs[i] = -rhs[0]*(1);
 }
 
 void multbymG(double *lhs, double *rhs) {
-  lhs[0] = -rhs[0]*(-1);
-  lhs[1] = -rhs[1]*(-1);
-  lhs[2] = -rhs[2]*(-1);
-  lhs[3] = -rhs[3]*(-1);
-  lhs[4] = -rhs[4]*(-1);
-  lhs[5] = -rhs[5]*(-1);
-  lhs[6] = -rhs[6]*(-1);
-  lhs[7] = -rhs[7]*(-1);
-  lhs[8] = -rhs[8]*(-1);
-  lhs[9] = -rhs[9]*(-1);
-  lhs[10] = -rhs[10]*(-1);
-  lhs[11] = -rhs[11]*(-1);
-  lhs[12] = -rhs[12]*(-1);
-  lhs[13] = -rhs[13]*(-1);
-  lhs[14] = -rhs[14]*(-1);
-  lhs[15] = -rhs[15]*(-1);
-  lhs[16] = -rhs[16]*(-1);
-  lhs[17] = -rhs[17]*(-1);
-  lhs[18] = -rhs[18]*(-1);
-  lhs[19] = -rhs[19]*(-1);
+  for (int i = 0; i < 20; ++i)
+    lhs[i] = -rhs[i] * (-1);
 }
 
 void multbymGT(double *lhs, double *rhs) {
-  lhs[0] = -rhs[0]*(-1);
-  lhs[1] = -rhs[1]*(-1);
-  lhs[2] = -rhs[2]*(-1);
-  lhs[3] = -rhs[3]*(-1);
-  lhs[4] = -rhs[4]*(-1);
-  lhs[5] = -rhs[5]*(-1);
-  lhs[6] = -rhs[6]*(-1);
-  lhs[7] = -rhs[7]*(-1);
-  lhs[8] = -rhs[8]*(-1);
-  lhs[9] = -rhs[9]*(-1);
-  lhs[10] = -rhs[10]*(-1);
-  lhs[11] = -rhs[11]*(-1);
-  lhs[12] = -rhs[12]*(-1);
-  lhs[13] = -rhs[13]*(-1);
-  lhs[14] = -rhs[14]*(-1);
-  lhs[15] = -rhs[15]*(-1);
-  lhs[16] = -rhs[16]*(-1);
-  lhs[17] = -rhs[17]*(-1);
-  lhs[18] = -rhs[18]*(-1);
-  lhs[19] = -rhs[19]*(-1);
+  for (int i = 0; i < 20; ++i)
+    lhs[i] = -rhs[i] * (-1);
 }
 
 void multbyP(double *lhs, double *rhs, Params& params) {
@@ -107,49 +53,13 @@ void multbyP(double *lhs, double *rhs, Params& params) {
 }
 
 void fillq(Workspace& work, Params& params) {
-  work.q[0] = -params.lambda[0]*params.Returns[0];
-  work.q[1] = -params.lambda[0]*params.Returns[1];
-  work.q[2] = -params.lambda[0]*params.Returns[2];
-  work.q[3] = -params.lambda[0]*params.Returns[3];
-  work.q[4] = -params.lambda[0]*params.Returns[4];
-  work.q[5] = -params.lambda[0]*params.Returns[5];
-  work.q[6] = -params.lambda[0]*params.Returns[6];
-  work.q[7] = -params.lambda[0]*params.Returns[7];
-  work.q[8] = -params.lambda[0]*params.Returns[8];
-  work.q[9] = -params.lambda[0]*params.Returns[9];
-  work.q[10] = -params.lambda[0]*params.Returns[10];
-  work.q[11] = -params.lambda[0]*params.Returns[11];
-  work.q[12] = -params.lambda[0]*params.Returns[12];
-  work.q[13] = -params.lambda[0]*params.Returns[13];
-  work.q[14] = -params.lambda[0]*params.Returns[14];
-  work.q[15] = -params.lambda[0]*params.Returns[15];
-  work.q[16] = -params.lambda[0]*params.Returns[16];
-  work.q[17] = -params.lambda[0]*params.Returns[17];
-  work.q[18] = -params.lambda[0]*params.Returns[18];
-  work.q[19] = -params.lambda[0]*params.Returns[19];
+  for (int i = 0; i < 20; ++i)
+    work.q[i] = -params.lambda[i]*params.Returns[i];
 }
 
 void fillh(Workspace& work) {
-  work.h[0] = 0;
-  work.h[1] = 0;
-  work.h[2] = 0;
-  work.h[3] = 0;
-  work.h[4] = 0;
-  work.h[5] = 0;
-  work.h[6] = 0;
-  work.h[7] = 0;
-  work.h[8] = 0;
-  work.h[9] = 0;
-  work.h[10] = 0;
-  work.h[11] = 0;
-  work.h[12] = 0;
-  work.h[13] = 0;
-  work.h[14] = 0;
-  work.h[15] = 0;
-  work.h[16] = 0;
-  work.h[17] = 0;
-  work.h[18] = 0;
-  work.h[19] = 0;
+  for (int i = 0; i < 20; ++i)
+    work.h[i] = 0.1;
 }
 
 void fillb(Workspace& work) {

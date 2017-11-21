@@ -1,4 +1,4 @@
-/* Produced by CVXGEN, 2017-11-11 14:57:56 -0500.  */
+/* Produced by CVXGEN, 2017-11-20 12:18:49 -0500.  */
 /* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
 /* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
 /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
@@ -19,12 +19,13 @@ void multbymAT(double *lhs, double *rhs) {
 
 void multbymG(double *lhs, double *rhs) {
   for (int i = 0; i < 20; ++i)
-    lhs[i] = -rhs[i] * (-1);
+    lhs[i] = -rhs[i];
+    lhs[i + 20] = rhs[i];
 }
 
 void multbymGT(double *lhs, double *rhs) {
   for (int i = 0; i < 20; ++i)
-    lhs[i] = -rhs[i] * (-1);
+    lhs[i] = -rhs[i] + rhs[i + 20];
 }
 
 void multbyP(double *lhs, double *rhs, Params& params) {
@@ -37,15 +38,17 @@ void multbyP(double *lhs, double *rhs, Params& params) {
 
 void fillq(Workspace& work, Params& params) {
   for (int i = 0; i < 20; ++i)
-    work.q[i] = -params.lambda[i]*params.Returns[i];
+    work.q[i] = -params.lambda[i] * params.Returns[i];
 }
 
 void fillh(Workspace& work) {
-  for (int i = 0; i < 20; ++i)
-    work.h[i] = 0.1;
+  for (int i = 0; i < 20; ++i) {
+    work.h[i] = 0.7;
+    work.h[i + 20] = -0.05;
+  }
 }
 
-void fillb(Workspace& work) {
+void fillb(void) {
   work.b[0] = 1;
 }
 

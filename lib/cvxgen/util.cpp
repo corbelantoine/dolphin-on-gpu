@@ -1,4 +1,4 @@
-/* Produced by CVXGEN, 2017-11-11 14:57:56 -0500.  */
+/* Produced by CVXGEN, 2017-11-20 12:18:49 -0500.  */
 /* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
 /* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
 /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
@@ -6,7 +6,7 @@
 
 /* Filename: util.c. */
 /* Description: Common utility file for all cvxgen code. */
-#include "solver.hpp"
+#include "solver.h"
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>

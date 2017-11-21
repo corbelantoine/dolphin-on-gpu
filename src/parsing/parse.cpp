@@ -50,7 +50,7 @@ fin::Asset parse(std::string path){
     json j;
     inFile >> j;
 
-    for (int i; i < j.size(); i++) {
+    for (int i = 0; i < j.size(); i++) {
         fin::close p = fin::close();
         p.date = hlp::Date(j[i][0].get<std::string>());
         p.value = j[i][1];

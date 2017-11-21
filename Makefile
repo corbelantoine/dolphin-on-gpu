@@ -1,18 +1,29 @@
-BUILD_DIR=build
-OUT_DIR=out
+CPP=g++
+CPPFLAGS=-Wall -pedantic -std=c++14
+LDFLAGS=-lboost_math_c99 -lboost_thread-mt -lm -lcgal -lmpfr -lgmp
 
-all:
-	+make -C $(BUILD_DIR)
+SRCS=lib/cvxgen/ldl.cpp \
+		 lib/cvxgen/matrix_support.cpp \
+		 lib/cvxgen/solver.cpp \
+		 lib/cvxgen/util.cpp \
+		 src/app/test.cpp \
+		 src/finance/asset.cpp \
+		 src/finance/portfolio.cpp \
+     src/helpers/date.cpp \
+		 src/parsing/parse.cpp 
+     #  src/optimization/optimizer.cpp
 
-doc:
-	mkdir -p out
-	+make -C $(BUILD_DIR) $@
+OBJS=$(SRCS:.cpp=.o)
 
-distclean:
-	$(RM) $(DIRS) $(BUILD_DIR)
-	$(RM) $(OUT_DIR)
+all: test
 
-%:
-	+make -C $(BUILD_DIR) $@
+test: $(OBJS)
+	$(CPP) $(CPPFLAGS) $(LDFLAGS) $(OBJS) -o test
 
-.PHONY: doc
+.PHONY: clean
+
+clean:
+	$(RM) $(OBJS)
+
+distclean: clean
+	$(RM) test

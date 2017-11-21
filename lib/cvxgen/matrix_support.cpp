@@ -18,9 +18,10 @@ void multbymAT(double *lhs, double *rhs) {
 }
 
 void multbymG(double *lhs, double *rhs) {
-  for (int i = 0; i < 20; ++i)
+  for (int i = 0; i < 20; ++i) {
     lhs[i] = -rhs[i];
     lhs[i + 20] = rhs[i];
+  }
 }
 
 void multbymGT(double *lhs, double *rhs) {
@@ -43,12 +44,12 @@ void fillq(Workspace& work, Params& params) {
 
 void fillh(Workspace& work) {
   for (int i = 0; i < 20; ++i) {
-    work.h[i] = 0.7;
+    work.h[i] = 0.2;
     work.h[i + 20] = -0.05;
   }
 }
 
-void fillb(void) {
+void fillb(Workspace& work) {
   work.b[0] = 1;
 }
 

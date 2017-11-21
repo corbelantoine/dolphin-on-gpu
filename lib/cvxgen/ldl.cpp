@@ -324,7 +324,7 @@ void ldl_solve(double *target, double *var, Workspace& work, Settings& settings)
   var[100] = work.v[80];
 #ifndef ZERO_LIBRARY_MODE
   if (settings.debug) {
-    printf("Squared norm for solution is %.8g.\n", check_residual(target, var));
+    printf("Squared norm for solution is %.8g.\n", check_residual(target, var, work, settings));
   }
 #endif
 }
@@ -1618,7 +1618,7 @@ void ldl_factor(Workspace& work, Settings& settings)  {
   work.d_inv[100] = 1/work.d[100];
 #ifndef ZERO_LIBRARY_MODE
   if (settings.debug) {
-    printf("Squared Frobenius for factorization is %.8g.\n", check_factorization());
+    printf("Squared Frobenius for factorization is %.8g.\n", check_factorization(work));
   }
 #endif
 }
@@ -2522,7 +2522,7 @@ double check_residual(double *target, double *multiplicand, Workspace& work, Set
   int i;
   double residual;
   residual = 0;
-  matrix_multiply(work.v, multiplicand);
+  matrix_multiply(work.v, multiplicand, work, settings);
   for (i = 0; i < 20; i++) {
     residual += (target[i] - work.v[i])*(target[i] - work.v[i]);
   }

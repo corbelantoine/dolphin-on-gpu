@@ -6,26 +6,30 @@
 
 /* Filename: util.c. */
 /* Description: Common utility file for all cvxgen code. */
-#include "solver.h"
+#include "solver.hpp"
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
 long global_seed = 1;
 static clock_t tic_timestart;
+
 void tic(void) {
   tic_timestart = clock();
 }
+
 float toc(void) {
   clock_t tic_timestop;
   tic_timestop = clock();
   printf("time: %8.2f.\n", (float)(tic_timestop - tic_timestart) / CLOCKS_PER_SEC);
   return (float)(tic_timestop - tic_timestart) / CLOCKS_PER_SEC;
 }
+
 float tocq(void) {
   clock_t tic_timestop;
   tic_timestop = clock();
   return (float)(tic_timestop - tic_timestart) / CLOCKS_PER_SEC;
 }
+
 void printmatrix(char *name, double *A, int m, int n, int sparse) {
   int i, j;
   printf("%s = [...\n", name);
@@ -39,9 +43,11 @@ void printmatrix(char *name, double *A, int m, int n, int sparse) {
   }
   printf("];\n");
 }
+
 double unif(double lower, double upper) {
   return lower + ((upper - lower)*rand())/RAND_MAX;
 }
+
 /* Next function is from numerical recipes in C. */
 #define IA 16807
 #define IM 2147483647
@@ -52,6 +58,7 @@ double unif(double lower, double upper) {
 #define NDIV (1+(IM-1)/NTAB)
 #define EPS 1.2e-7
 #define RNMX (1.0-EPS)
+
 float ran1(long*idum, int reset) {
   int j;
   long k;
@@ -81,6 +88,7 @@ float ran1(long*idum, int reset) {
   if ((temp=AM*iy)> RNMX) return RNMX;
   else return temp;
 }
+
 /* Next function is from numerical recipes in C. */
 float randn_internal(long *idum, int reset) {
   static int iset=0;
@@ -104,9 +112,11 @@ float randn_internal(long *idum, int reset) {
     return gset;
   }
 }
+
 double randn(void) {
   return randn_internal(&global_seed, 0);
 }
+
 void reset_rand(void) {
   srand(15);
   global_seed = 1;

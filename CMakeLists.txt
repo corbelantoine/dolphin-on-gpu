@@ -12,13 +12,14 @@ set(SOURCE_FILES
         lib/cvxgen/solver.cpp
         lib/cvxgen/util.cpp
         lib/json.hpp
-        src/app/main.cpp
+  #      src/app/main.cpp
+        src/app/test.cpp
         src/finance/asset.cpp
         src/finance/asset.hpp
         src/finance/portfolio.cpp
         src/finance/portfolio.hpp
-        src/optimization/optimizer.cpp
-        src/optimization/optimizer.hpp
+  #      src/optimization/optimizer.cpp
+  #      src/optimization/optimizer.hpp
 		    src/helpers/date.cpp
 		    src/helpers/date.hpp
         src/parsing/parse.cpp

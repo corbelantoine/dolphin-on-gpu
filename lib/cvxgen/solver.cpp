@@ -58,7 +58,7 @@ double eval_objv(Workspace& work, Params& params) {
   int i;
   double objv;
   /* Borrow space in work.rhs. */
-  multbyP(work.rhs, work.x);
+  multbyP(work.rhs, work.x, params);
   objv = 0;
   for (i = 0; i < 20; i++)
     objv += work.x[i]*work.rhs[i];
@@ -81,7 +81,7 @@ void fillrhs_aff(Workspace& work, Params& params) {
   multbymGT(work.buffer, work.z);
   for (i = 0; i < 20; i++)
     r1[i] += work.buffer[i];
-  multbyP(work.buffer, work.x);
+  multbyP(work.buffer, work.x, params);
   for (i = 0; i < 20; i++)
     r1[i] -= work.buffer[i] + work.q[i];
   /* r2 = -z. */
@@ -365,7 +365,7 @@ long solve(Workspace& work, Settings& settings, Params& params, Vars& vars) {
     work.ineq_resid_squared = calc_ineq_resid_squared(work);
 #ifndef ZERO_LIBRARY_MODE
     if (settings.verbose) {
-      work.optval = eval_objv();
+      work.optval = eval_objv(work, params);
       printf("%3d   %10.3e  %9.2e  %9.2e  %9.2e  % 6.4f\n",
           iter+1, work.optval, work.gap, sqrt(work.eq_resid_squared),
           sqrt(work.ineq_resid_squared), alpha);

@@ -117,7 +117,7 @@ void Portfolio::print_weights() const
   int size = this->assets.size();
   for (int i = 0; i < size; ++i) {
     float w = std::get<1>(this->assets[i]);
-    std::cout << std::fixed << std::setprecision(2) << w << "||";
+    std::cout << std::fixed << std::setprecision(2) << w << "|";
   }
   std::cout << std::endl;
 }

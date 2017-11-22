@@ -45,7 +45,7 @@ void fillq(Workspace& work, Params& params) {
 void fillh(Workspace& work) {
   for (int i = 0; i < 20; ++i) {
     work.h[i] = 0.2;
-    work.h[i + 20] = -0.05;
+    work.h[i + 20] = -0.01;
   }
 }
 

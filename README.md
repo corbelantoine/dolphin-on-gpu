@@ -1,6 +1,7 @@
 # dolphin-on-gpu
 
 ### Depedencies
+
 cgal : quadratic problem solver
 
 **Unix**: `sudo apt-get install libcgal-dev`
@@ -9,6 +10,8 @@ cgal : quadratic problem solver
 
 **Windows**: Really ??
 
-### Pour lancer le projet :
-`make` génère les binaires à la racine
+### Running project:
 
+**Compile**: `make`
+
+**Run**: `./dolphin`

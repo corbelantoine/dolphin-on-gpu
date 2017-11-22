@@ -29,24 +29,26 @@ __host__ fin::Portfolio get_optimal_portfolio(fin::Asset *h_assets, int *port_as
                                     hlp::Date& d1, hlp::Date& d2,
                                     size_t n, size_t nb_p = 10, size_t k = 20)
 {
+  fin::Portfolio h_portfolios[nb_p];
   fin::Portfolio *d_portfolios;
+  
+  float h_sharp[nb_p];
   float* d_sharp;
 
-  fin::Portfolio h_portfolios[nb_p];
-  float h_sharp[nb_p];
   fin::Portfolio optimal_portfolio;
-
+  
   cudaMemcpyToSymbol(all_assets, h_assets, sizeof(fin::Asset) * n);
   cudaMemcpyToSymbol(portfolio_assets, port_assets, sizeof(int) * nb_p * k);
   cudaError_t err = cudaMalloc((void **) &d_portfolios, sizeof(fin::Portfolio) * nb_p);
   check_error(err);
-  cudaError_t err = cudaMalloc((void **) &sharp, sizeof(float) * nb_p);
+  cudaError_t err = cudaMalloc((void **) &d_sharp, sizeof(float) * nb_p);
   check_error(err);
 
   // TODO adapt grid and block size
   dim3 DimGrid(((n - 1) / 256, 1, 1));
   dim3 DimBlock(256, 1, 1);
-  optimize_portfolios_kernel<<<DimGrid, DimBlock>>>(d_portfolios, d1, d2,
+  optimize_portfolios_kernel<<<DimGrid, DimBlock>>>(d_portfolios, d_sharp,
+                                                    d1, d2,
                                                     n, nb_p, k);
 
   cudaMemcpy(h_portfolios, d_portfolios, sizeof(fin::Portfolio) * nb_p, cudaMemcpyDeviceToHost);

@@ -1,30 +1,31 @@
 cmake_minimum_required(VERSION 3.8)
+set(CMAKE_CXX_STANDARD 14)
+set(GCC_COVERAGE_LINK_FLAGS "-lm")
+
 project(dolphin_private)
 
-set(CMAKE_CXX_STANDARD 14)
+find_package(CUDA REQUIRED)
 
-SET(GCC_COVERAGE_LINK_FLAGS "-lm")
+# Pass options to NVCC
+set(CUDA_NVCC_FLAGS "-x cu")
 
 set(SOURCE_FILES
         lib/cvxgen/ldl.cpp
         lib/cvxgen/matrix_support.cpp
-        lib/cvxgen/solver.hpp
         lib/cvxgen/solver.cpp
         lib/cvxgen/util.cpp
-        lib/json.hpp
-  #      src/app/main.cpp
-        src/app/test.cpp
+        src/app/main.cpp
         src/finance/asset.cpp
-        src/finance/asset.hpp
         src/finance/portfolio.cpp
-        src/finance/portfolio.hpp
   #      src/optimization/optimizer.cpp
-  #      src/optimization/optimizer.hpp
-		    src/helpers/date.cpp
-		    src/helpers/date.hpp
-        src/parsing/parse.cpp
-        src/parsing/parse.hpp)
+		src/helpers/date.cpp
+        src/parsing/parse.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR})
+
+# Specify binary name and source file to build it from
+cuda_add_executable(
+    optimizer
+    src/optimization/optimizer.cpp)
 
 add_executable(dolphin ${SOURCE_FILES})

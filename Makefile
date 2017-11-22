@@ -1,4 +1,4 @@
-CPP=nvcc --std=c++11 -G -g -lineinfo -Wno-deprecated-gpu-targets
+CPP=nvcc --std=c++11 -G -g -lineinfo -Wno-deprecated-gpu-targets 
 
 LIB=lib/cvxgen/ldl.cpp \
 	lib/cvxgen/matrix_support.cpp \

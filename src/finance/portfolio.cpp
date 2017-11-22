@@ -12,36 +12,28 @@
 namespace fin
 {
 
-// void Portfolio::add_asset(Asset *asset, float shares);
-
-std::vector<std::tuple<Asset*, float>> Portfolio::get_assets() const
+std::vector<Asset*> Portfolio::get_assets() const
 {
   return this->assets;
 }
 
-void Portfolio::set_assets(std::vector<std::tuple<Asset*, float>> assets)
+void Portfolio::set_assets(std::vector<Asset*> assets)
 {
-  float sum = std::accumulate(assets.begin(), assets.end(), 0.0,
-                              [](float s, std::tuple<Asset*, float> a) -> float {
-                                return s + std::get<1>(a);
-                              });
-  float eps = 0.01;
-  if (sum >= 1 - eps && sum <= 1 + eps)
-    this->assets = assets;
-  else
-    throw std::invalid_argument("Weights must sum to 1");
+  this->assets = assets;
 }
 
 void Portfolio::set_weights(std::vector<float> weights)
 {
+  if (weights.size() != this->assets.size())
+    throw std::invalid_argument("Weights and assets must have same size");
+
   float sum = std::accumulate(weights.begin(), weights.end(), 0.0,
                               [](float s, float w) -> float {
                                 return s + w;
                               });
   float eps = 0.01;
   if (sum >= 1 - eps && sum <= 1 + eps)
-    for (size_t i = 0; i != weights.size(); ++i)
-      std::get<1>(this->assets[i]) = weights[i];
+    this->weights = weights;
   else
     throw std::invalid_argument("Weights must sum to 1");
 }
@@ -51,22 +43,21 @@ std::vector<float> Portfolio::get_returns(hlp::Date start_date, hlp::Date end_da
 {
   std::vector<float> returns(this->assets.size());
   std::transform(this->assets.begin(), this->assets.end(), returns.begin(),
-                [&start_date, &end_date](std::tuple<Asset*, float> a) -> float {
-                  return std::get<0>(a)->get_return(start_date, end_date);
+                [&start_date, &end_date](Asset* a) -> float {
+                  return a->get_return(start_date, end_date);
                 });
   return returns;
 }
 
 float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
 {
-  std::vector<float> returns(this->assets.size());
-  std::transform(this->assets.begin(), this->assets.end(), returns.begin(),
-                [&start_date, &end_date](std::tuple<Asset*, float> a) -> float {
-                  float ret = std::get<0>(a)->get_return(start_date, end_date);
-                  float w = std::get<1>(a);
-                  return w * ret;
-                });
-  return std::accumulate(returns.begin(), returns.end(), 0.0);
+  float ret = 0.0;
+  for (int i = 0; i < this->assets.size(); ++i) {
+    float r = this->assets[i]->get_return(start_date, end_date);
+    float w = this->weights[i];
+    ret += w * r;
+  }
+  return ret;
 }
 
 std::vector<float> Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const
@@ -79,8 +70,8 @@ std::vector<float> Portfolio::get_covariance(hlp::Date start_date, hlp::Date end
       if (j < i)
         covariance[i * this->assets.size() + j] = covariance[j * this->assets.size() + i];
       else {
-        std::vector<float> ri = std::get<0>(this->assets[i])->get_returns(start_date, end_date);
-        std::vector<float> rj = std::get<0>(this->assets[j])->get_returns(start_date, end_date);
+        std::vector<float> ri = this->assets[i]->get_returns(start_date, end_date);
+        std::vector<float> rj = this->assets[j]->get_returns(start_date, end_date);
         float ri_avg = std::accumulate(ri.begin(), ri.end(), 0.0) / ri.size();
         float rj_avg = std::accumulate(rj.begin(), rj.end(), 0.0) / rj.size();
 
@@ -100,8 +91,8 @@ float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const
   for (std::size_t i = 0; i != this->assets.size(); ++i)
     for (std::size_t j = 0; j != this->assets.size(); ++j)
     {
-      float wi = std::get<1>(this->assets[i]);
-      float wj = std::get<1>(this->assets[j]);
+      float wi = this->weights[i];
+      float wj = this->weights[j];
       vol += wi * wj * cov[i * this->assets.size() + j];
     }
   return sqrtf(vol);
@@ -118,7 +109,7 @@ void Portfolio::print_weights() const
 {
   int size = this->assets.size();
   for (int i = 0; i < size; ++i) {
-    float w = std::get<1>(this->assets[i]);
+    float w = this->weights[i];
     std::cout << std::fixed << std::setprecision(2) << w << "|";
   }
   std::cout << std::endl;

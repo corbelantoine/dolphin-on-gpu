@@ -31,14 +31,15 @@ fin::Portfolio get_random_portfolio(std::vector<fin::Asset>& assets, size_t n = 
   std::random_shuffle(tmp.begin(), tmp.end());
   std::vector<std::size_t> indices(tmp.begin(), tmp.begin() + n);
 
-  std::vector<std::tuple<fin::Asset*, float>> p_assets(n);
+  std::vector<fin::Asset*> p_assets(n);
+  std::vector<float> p_weights(n);
   for (std::size_t i = 0; i != n; ++i)
   {
-    float w = 1. / n;
-    std::tuple<fin::Asset*, float> tmp = std::make_tuple(&assets[indices[i]], w);
-    p_assets[i] = tmp;
+    p_assets[i] = &assets[indices[i]];
+    p_weights[i] = 1. / n;
   }
   p.set_assets(p_assets);
+  p.set_weights(p_weights);
 
   return p;
 }

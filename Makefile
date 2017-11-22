@@ -1,18 +1,36 @@
-BUILD_DIR=build
-OUT_DIR=out
+CPP=nvcc --std=c++11 -G -g -lineinfo -Wno-deprecated-gpu-targets
+
+LIB=lib/cvxgen/ldl.cpp \
+	lib/cvxgen/matrix_support.cpp \
+	lib/cvxgen/solver.cpp \
+	lib/cvxgen/util.cpp 
+	
+SRC=src/app/main.cpp \
+    src/finance/asset.cpp \
+    src/finance/portfolio.cpp \
+    src/helpers/date.cpp \
+    src/parsing/parse.cpp \
+	src/optimization/optimizer.cu
+
+# UNIT=src/tests/unit_test.cc
+
+BIN=main
+
+# UBIN=unit
+
+CPPFLAGS=-lcuda -lcublas
 
 all:
-	+make -C $(BUILD_DIR)
+	$(CPP) $(LIB) $(SRC) $(CPPFLAGS) -o $(BIN)
 
-doc:
-	mkdir -p out
-	+make -C $(BUILD_DIR) $@
+check: all
+	./$(BIN)
 
-distclean:
-	$(RM) $(DIRS) $(BUILD_DIR)
-	$(RM) $(OUT_DIR)
+# unit:
+# 	$(CPP) $(LIB) $(UNIT) $(CPPFLAGS) -o $(UBIN)
+# 	./$(UBIN)
 
-%:
-	+make -C $(BUILD_DIR) $@
+clean:
+	$(RM) $(BIN) # $(UBIN)
 
-.PHONY: doc
+.PHONY: clean

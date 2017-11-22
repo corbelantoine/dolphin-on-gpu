@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include <numeric>
-#include <stdexcept>
+// #include <stdexcept>
 
 #include <iostream>
 #include <iomanip>
@@ -27,7 +27,8 @@ void Portfolio::set_assets(std::vector<std::tuple<Asset*, float>> assets)
   if (sum >= 1 - eps && sum <= 1 + eps)
     this->assets = assets;
   else
-    throw std::invalid_argument("Weights must sum to 1");
+    std::cout << "Weights must sum to 1. actual sum:" << sum <<std::endl;
+    // throw std::invalid_argument("Weights must sum to 1");
 }
 
 void Portfolio::set_weights(std::vector<float> weights)
@@ -41,7 +42,8 @@ void Portfolio::set_weights(std::vector<float> weights)
     for (size_t i = 0; i != weights.size(); ++i)
       std::get<1>(this->assets[i]) = weights[i];
   else
-    throw std::invalid_argument("Weights must sum to 1");
+    std::cout << "Weights must sum to 1. actual sum:" << sum <<std::endl;
+    // throw std::invalid_argument("Weights must sum to 1");
 }
 
 

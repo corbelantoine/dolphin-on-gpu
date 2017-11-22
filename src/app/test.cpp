@@ -1,11 +1,67 @@
 #include <iostream>
 #include <algorithm>
 
+#include <CGAL/basic.h>
+#include <CGAL/QP_models.h>
+#include <CGAL/QP_functions.h>
+
+#include <CGAL/Gmpzf.h>
+typedef CGAL::Gmpzf ET;
+
+// program and solution types
+typedef CGAL::Quadratic_program<float> Program;
+typedef CGAL::Quadratic_program_solution<ET> Solution;
+
 #include "../helpers/date.hpp"
 #include "../parsing/parse.hpp"
 #include "../finance/portfolio.hpp"
 
-#include "../../lib/cvxgen/solver.hpp"
+
+void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2,
+  float min, float max, float lambda)
+{
+  Program qp (CGAL::EQUAL, true, min, true, max);
+  int n = p.get_assets().size();
+
+  std::vector<float> returns = p.get_returns(d1, d2);
+
+  for (int j = 0; j < n; ++j) {
+    // set A (sum of weights : A = (1, ..., 1))
+    qp.set_a(j, 0, 1);
+    // set u to max;
+    qp.set_u(j, true, max);
+    // set l to min;
+    qp.set_l(j, true, min);
+    // set c to - lambda * return
+    qp.set_c(j, -lambda * returns[j]);
+  }
+
+  // set b to 1 (sum of weights = 1.0)
+  qp.set_b(0, 1.0);
+  // set relation to EQUAL
+  qp.set_r(0, CGAL::EQUAL);
+
+  // set D to covrariance matrix
+  std::vector<float> cov = p.get_covariance(d1, d2);
+  for (int i = 0; i < n; ++i)
+    for (int j = 0; j <= i; ++j)
+      qp.set_d(i, j, cov[i * n + j]);
+
+  // solve the program, using ET as the exact type
+  Solution sol = CGAL::solve_quadratic_program(qp, ET());
+
+  // get optimal weights
+  Solution::Variable_value_iterator opt_weights = sol.variable_values_begin();
+  std::vector<float> weights(n);
+  for (int i = 0; i < n; ++i) {
+    CGAL::Quotient<ET> weight = *(opt_weights++);
+    weights[i] = (float) CGAL::to_double(weight);
+    std::cout << weights[i] << "|";
+  }
+  std::cout<<std::endl;
+
+ p.set_weights(weights);
+}
 
 
 void print_ret_vol(fin::Portfolio& p, hlp::Date& start_date, hlp::Date& end_date)
@@ -37,42 +93,10 @@ fin::Portfolio get_random_portfolio(std::vector<fin::Asset>& assets, size_t n = 
   return p;
 }
 
-void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2, int verbose = 0)
-{
-  Workspace work;
-  Settings settings;
-  Params params;
-  Vars vars;
-
-  int num_iters;
-  set_defaults(settings);
-  setup_indexing(work, vars);
-
-  std::vector<float> cov = p.get_covariance(d1, d2);
-  for (std::size_t i = 0; i != cov.size(); ++i)
-    params.Sigma[i] = cov[i];
-
-  std::vector<float> returns = p.get_returns(d1, d2);
-  for (std::size_t i = 0; i != returns.size(); ++i)
-    params.Returns[i] = returns[i];
-
-  params.lambda[0] = 1;
-
-  /* Solve problem instance for the record. */
-  settings.verbose = verbose;
-  num_iters = solve(work, settings, params, vars);
-
-  std::vector<float> weights(20);
-  for (size_t i = 0; i != weights.size(); ++i)
-    weights[i] = vars.Weights[i];
-
-  p.set_weights(weights);
-}
-
 int main(int argc, char* argv[])
 {
-  hlp::Date d1 = hlp::Date("2008-07-01");
-  hlp::Date d2 = hlp::Date("2016-07-01");
+  // hlp::Date d1 = hlp::Date("2008-07-01");
+  // hlp::Date d2 = hlp::Date("2016-07-01");
 
   hlp::Date d3 = hlp::Date("2010-07-01");
   hlp::Date d4 = hlp::Date("2010-08-01");
@@ -83,12 +107,24 @@ int main(int argc, char* argv[])
     fin::Portfolio p = get_random_portfolio(assets, 20);
 
     std::cout << "before optimization:\n";
-    p.print_weights();
     print_ret_vol(p, d3, d4);
-    optimize_portfolio(p, d3, d4, 1);
-    std::cout << "after optimization:\n";
-    print_ret_vol(p, d3, d4);
-    p.print_weights();
+    char rep = 'r';
+    float min;
+    float max;
+    float lambda = 1;
+    while (rep == 'r') {
+      std::cout<< "enter values in that order: min max lambda\n";
+      std::cin >> min;
+      std::cin >> max;
+      std::cin >> lambda;
+      optimize_portfolio(p, d3, d4, min, max, lambda);
+      std::cout << "after optimization:\n";
+      print_ret_vol(p, d3, d4);
+      // p.print_weights();
+      // std::cout<< "enter r for repeat, any other character to exit\n";
+      // std::cin >> rep;
+    }
+
   } catch(const std::exception& e) {
     std::cout << e.what() << std::endl ;
   }

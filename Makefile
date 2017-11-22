@@ -2,15 +2,11 @@ CPP=g++
 CPPFLAGS=-Wall -pedantic -std=c++14
 LDFLAGS=-lboost_math_c99 -lboost_thread-mt -lm -lcgal -lmpfr -lgmp
 
-SRCS=lib/cvxgen/ldl.cpp \
-		 lib/cvxgen/matrix_support.cpp \
-		 lib/cvxgen/solver.cpp \
-		 lib/cvxgen/util.cpp \
-		 src/app/test.cpp \
+SRCS=src/app/test.cpp \
 		 src/finance/asset.cpp \
 		 src/finance/portfolio.cpp \
      src/helpers/date.cpp \
-		 src/parsing/parse.cpp 
+		 src/parsing/parse.cpp
      #  src/optimization/optimizer.cpp
 
 OBJS=$(SRCS:.cpp=.o)

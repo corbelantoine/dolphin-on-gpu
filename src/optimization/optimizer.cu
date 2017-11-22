@@ -1,5 +1,3 @@
-#include <tuple>
-
 #include "optimizer.hpp"
 
 
@@ -65,14 +63,13 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
 {
   size_t portfolio_idx = threadIdx.x + blockDim.x * blockIdx.x;
   if (portfolio_idx < nb_p) {
-    std::vector<std::tuple<fin::Asset*, float>> p_assets(k);
+    std::vector<fin::Asset*> p_assets(k);
+    std::vector<float> p_weights(k);
     for (std::size_t j = 0; j != k; ++j)
     {
-      float w = 1. / k;
       int asset_id = portfolio_assets[portfolio_idx * k + j];
-      fin::Asset* asset = &all_assets[asset_id];
-      std::tuple<fin::Asset*, float> tmp = std::make_tuple(asset, w);
-      p_assets[j] = tmp;
+      p_weights[j] = 1. / k;
+      p_assets[j] = &all_assets[asset_id];
     }
     d_portfolios[portfolio_idx].set_assets(p_assets);
     optimize_portfolio(d_portfolios[portfolio_idx], d1, d2, 0);

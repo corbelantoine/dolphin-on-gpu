@@ -20,6 +20,13 @@ typedef CGAL::Quadratic_program_solution<ET> Solution;
 void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2,
   float min, float max, float lambda)
 {
+  /*
+  arg1 : set default relation to EQUAL
+  arg2 : permit default lower bound
+  arg3 : set default lower bound to min
+  arg4 : permit default upper bound
+  arg5 : set default upper bound to max
+  */
   Program qp (CGAL::EQUAL, true, min, true, max);
   int n = p.get_assets().size();
 
@@ -28,18 +35,11 @@ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2,
   for (int j = 0; j < n; ++j) {
     // set A (sum of weights : A = (1, ..., 1))
     qp.set_a(j, 0, 1);
-    // set u to max;
-    qp.set_u(j, true, max);
-    // set l to min;
-    qp.set_l(j, true, min);
     // set c to - lambda * return
     qp.set_c(j, -lambda * returns[j]);
   }
-
   // set b to 1 (sum of weights = 1.0)
   qp.set_b(0, 1.0);
-  // set relation to EQUAL
-  qp.set_r(0, CGAL::EQUAL);
 
   // set D to covrariance matrix
   std::vector<float> cov = p.get_covariance(d1, d2);
@@ -56,6 +56,7 @@ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2,
   for (int i = 0; i < n; ++i) {
     CGAL::Quotient<ET> weight = *(opt_weights++);
     weights[i] = (float) CGAL::to_double(weight);
+    // print optimal weights
     std::cout << weights[i] << "|";
   }
   std::cout<<std::endl;

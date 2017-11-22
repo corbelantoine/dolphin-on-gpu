@@ -2,6 +2,8 @@
 
 #include <math.h>
 #include <numeric>
+#include <algorithm>
+
 #include <stdexcept>
 
 #include <iostream>

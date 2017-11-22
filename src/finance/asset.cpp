@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <numeric>
+#include <algorithm>
 
 namespace fin
 {

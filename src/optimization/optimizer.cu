@@ -1,6 +1,3 @@
-#include <cstdio>
-#include <cstdlib>
-
 #include "optimizer.hpp"
 
 namespace opt

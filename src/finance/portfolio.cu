@@ -51,6 +51,11 @@ __host__ void Portfolio::check_error(cudaError_t err)
   }
 }
 
+__host__ __device__ int Portfolio::get_size() const
+{
+  return this->size;
+}
+
 __host__ __device__ Asset** Portfolio::get_assets() const
 {
   return this->assets;

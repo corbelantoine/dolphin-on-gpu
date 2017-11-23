@@ -12,20 +12,10 @@
 namespace fin
 {
 
-__device__ void check_error(cudaError_t err)
-{
-  if (err != cudaSuccess) {
-    std::cerr << cudaGetErrorString(err)
-    << "in " << __FILE__
-    << "at line " << __LINE__
-    << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
 __host__ __device__ Portfolio::Portfolio(int size, bool gpu)
 {
   this->size = size;
+  this->gpu = gpu;
   if (gpu) {
     // portfolio object is going to be used on gpu
     cudaError_t err = cudaMalloc((void **) &(this->assets), sizeof(Asset*) * size);
@@ -36,6 +26,28 @@ __host__ __device__ Portfolio::Portfolio(int size, bool gpu)
     // portfolio object is going to be used on cpu
     this->assets = new Asset* [size];
     this->weights = new float [size];
+  }
+}
+
+__host__ __device__ Portfolio::~Portfolio()
+{
+  if (this->gpu) {
+    cudaFree(this->assets);
+    cudaFree(this->weights);
+  } else {
+    delete[] this->assets;
+    delete[] this->weights;
+  }
+}
+
+__host__ void Portfolio::check_error(cudaError_t err)
+{
+  if (err != cudaSuccess) {
+    std::cerr << cudaGetErrorString(err)
+    << "in " << __FILE__
+    << "at line " << __LINE__
+    << std::endl;
+    exit(EXIT_FAILURE);
   }
 }
 

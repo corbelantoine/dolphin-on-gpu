@@ -38,11 +38,14 @@ __device__ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& 
 
   int p_size = 20;
 
+  // setting the quadratic problem
+  // set Sigma to the covaraince matrix
   float* cov = p.get_covariance(d1, d2);
   int cov_size = p_size ** p_size;
   for (int i = 0; i < cov_size; ++i)
     params.Sigma[i] = cov[i];
 
+  // set Returns to returns
   int n;
   float* returns = p.get_returns(d1, d2, &n);
   for (int i = 0; i < n; ++i)
@@ -50,15 +53,21 @@ __device__ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& 
 
   params.lambda[0] = 0.8;
 
-  /* Solve problem instance for the record. */
+  // Solve problem
   settings.verbose = verbose;
   solve(work, settings, params, vars);
 
+  // get solution (optimal weights)
   float weights[p_size];
   for (int i = 0; i < p_size; ++i)
     weights[i] = vars.Weights[i];
 
+  // set portfolio weights
   p.set_weights(weights);
+
+  // free cov and ret
+  cudaFree(cov);
+  cudaFree(returns);
 }
 
 __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* d_sharp,
@@ -68,7 +77,7 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
   int portfolio_idx = threadIdx.x + blockDim.x * blockIdx.x;
   if (portfolio_idx < nb_p) {
     // create portfolio
-    fin::Portfolio p = fin::Portfolio(k, true) 
+    fin::Portfolio p = fin::Portfolio(k)
     fin::Asset* p_assets[k];
     float p_weights[k];
     for (int j = 0; j < k; ++j) {
@@ -92,7 +101,7 @@ __host__ fin::Portfolio get_optimal_portfolio(fin::Asset *h_assets, int *port_as
                                     hlp::Date& d1, hlp::Date& d2,
                                     int n, int nb_p, int k)
 {
-  fin::Portfolio h_portfolios[nb_p]; //(k, false);
+  fin::Portfolio h_portfolios[nb_p]; // Maybe we need to init size (k);
   fin::Portfolio *d_portfolios;
 
   float h_sharp[nb_p];
@@ -124,13 +133,20 @@ __host__ fin::Portfolio get_optimal_portfolio(fin::Asset *h_assets, int *port_as
   cudaFree(d_sharp);
 
   // get portfolio with max sharp
+  int max_idx = 0;
   float max_sharp = h_sharp[0];
   for (int i = 0; i < nb_p; ++i)
     if (h_sharp[i] > max_sharp) {
       max_sharp = h_sharp[i];
-      optimal_portfolio = h_portfolios[i];
+      max_idx = i;
     }
+  // set optimal portfolio
+  optimal_portfolio = h_portfolios[max_idx];
 
+  // free host memory
+  delete[] h_portfolios;
+  delete[] h_sharp;
+  
   return optimal_portfolio;
 }
 

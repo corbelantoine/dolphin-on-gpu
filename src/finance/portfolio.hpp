@@ -1,6 +1,8 @@
 #pragma once
 
-#include <vector>
+#include <cstdio>
+#include <cstdlib>
+
 #include "asset.hpp"
 #include "../helpers/date.hpp"
 

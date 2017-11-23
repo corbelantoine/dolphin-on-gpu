@@ -6,9 +6,9 @@ LIB=lib/cvxgen/ldl.cpp \
 	lib/cvxgen/util.cpp 
 	
 SRC=src/app/main.cpp \
-    src/finance/asset.cpp \
-    src/finance/portfolio.cpp \
-    src/helpers/date.cpp \
+    src/finance/asset.cu \
+    src/finance/portfolio.cu \
+    src/helpers/date.cu \
     src/parsing/parse.cpp \
 	src/optimization/optimizer.cu
 

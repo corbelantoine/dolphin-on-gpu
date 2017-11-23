@@ -1,7 +1,4 @@
-#include "date.hpp"
-
-#include <cstdio>
-#include <cstdlib>
+#include "date.cuh"
 
 namespace hlp
 {
@@ -13,38 +10,45 @@ Date::Date(std::string str_date)
   this->day = std::stoi(str_date.substr(8, 2));
 }
 
-__host__ __device__ int Date::get_day() const
+__host__ __device__
+int Date::get_day() const
 {
   return this->day;
 }
 
-__host__ __device__ int Date::get_month() const
+__host__ __device__
+int Date::get_month() const
 {
   return this->month;
 }
 
-__host__ __device__ int Date::get_year() const
+__host__ __device__
+int Date::get_year() const
 {
   return this->year;
 }
 
-__host__ __device__ void Date::set_day(int day)
+__host__ __device__
+void Date::set_day(int day)
 {
   if (day > 0 && day < 32)
     this->day = day;
 }
 
-__host__ __device__ void Date::set_month(int month)
+__host__ __device__
+void Date::set_month(int month)
 {
   if (month > 0 and month < 13)
     this->month = month;
 }
-__host__ __device__ void Date::set_year(int year) {
+__host__ __device__
+void Date::set_year(int year) {
   if (year > 1900 && year < 2100)
     this->year = year;
 }
 
-__host__ __device__ bool Date::operator<(const Date& d) const
+__host__ __device__
+bool Date::operator<(const Date& d) const
 {
   // check year
   if (this->year < d.get_year())
@@ -63,27 +67,32 @@ __host__ __device__ bool Date::operator<(const Date& d) const
 }
 
 
-__host__ __device__ bool Date::operator>(const Date& d) const
+__host__ __device__
+bool Date::operator>(const Date& d) const
 {
   return !(*this < d);
 }
 
-__host__ __device__ bool Date::operator==(const Date& d) const
+__host__ __device__
+bool Date::operator==(const Date& d) const
 {
   return this->year == d.get_year() && this->month == d.get_month() && this->day == d.get_day();
 }
 
-__host__ __device__ bool Date::operator<=(const Date& d) const
+__host__ __device__
+bool Date::operator<=(const Date& d) const
 {
   return *this < d || *this == d;
 }
 
-__host__ __device__ bool Date::operator>=(const Date& d) const
+__host__ __device__
+bool Date::operator>=(const Date& d) const
 {
   return *this > d || *this == d;
 }
 
-__host__ __device__ bool Date::operator!=(const Date& d) const
+__host__ __device__
+bool Date::operator!=(const Date& d) const
 {
   return !(*this == d);
 }

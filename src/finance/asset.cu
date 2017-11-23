@@ -38,7 +38,8 @@ Close* Asset::get_closes() const
   return this->closes;
 }
 
-__host__ __device__ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
+__host__ __device__
+Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
         int *n) const
 {
   int start, end;
@@ -60,17 +61,20 @@ __host__ __device__ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end
   #else
     closes = new Close[*n];
   #endif
+  // set closes
   for (int i = 0; i < *n; ++i)
     closes[i] = this->closes[i + start];
   return closes;
 }
 
+__host__ __device__
 float Asset::get_return() const
 {
   float v1 = this->closes[0].value;
   float v2 = this->closes[this->size - 1].value;
   return (v2 - v1) / v1;
 }
+
 
 float Asset::get_return(hlp::Date start_date, hlp::Date end_date) const
 {
@@ -85,7 +89,8 @@ float Asset::get_return(hlp::Date start_date, hlp::Date end_date) const
   return (v2 - v1) / v1;
 }
 
-__host__ __device__ float* Asset::get_returns(int *n) const
+__host__ __device__
+float* Asset::get_returns(int *n) const
 {
   *n = this->size - 1;
   // allocate memory for returns
@@ -101,11 +106,12 @@ __host__ __device__ float* Asset::get_returns(int *n) const
       float v2 = this->closes[i + 1].value;
       returns[i] = (v2 - v1) / v1;
   }
-  
+
   return returns;
 }
 
-__host__ __device__ float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
+__host__ __device__
+float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
         int* n) const
 {
   // get asset closes on this period (start->end)
@@ -134,7 +140,8 @@ __host__ __device__ float* Asset::get_returns(hlp::Date start_date, hlp::Date en
   return returns;
 }
 
-__host__ __device__ float Asset::get_volatility() const
+__host__ __device__
+float Asset::get_volatility() const
 {
   int n;
   // get daily returns
@@ -159,7 +166,8 @@ __host__ __device__ float Asset::get_volatility() const
   return sqrtf(var);
 }
 
-__host__ __device__ float Asset::get_volatility(hlp::Date start_date, hlp::Date end_date) const
+__host__ __device__
+float Asset::get_volatility(hlp::Date start_date, hlp::Date end_date) const
 {
   int n;
   // get dayly returns

@@ -77,7 +77,7 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
   int portfolio_idx = threadIdx.x + blockDim.x * blockIdx.x;
   if (portfolio_idx < nb_p) {
     // create portfolio
-    fin::Portfolio p = fin::Portfolio(k)
+    fin::Portfolio p = fin::Portfolio(k);
     fin::Asset* p_assets[k];
     float p_weights[k];
     for (int j = 0; j < k; ++j) {
@@ -91,7 +91,7 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
     // optimize portfolio (get optimal weights)
     optimize_portfolio(p, d1, d2, 0);
     // save portfolio to shared memory
-    d_portfolios[portfolio_idx] = p
+    d_portfolios[portfolio_idx] = p;
     // set portfolio sharp for further use
     d_sharp[portfolio_idx] = p.get_sharp(d1, d2);
   }

@@ -1,4 +1,4 @@
-#include "asset.hpp"
+#include "asset.cuh"
 
 #include <math.h>
 #include <numeric>
@@ -39,7 +39,7 @@ Close* Asset::get_closes() const
 }
 
 __host__ __device__ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
-        int *n, bool gpu) const
+        int *n) const
 {
   int start, end;
   // get period (start -> end)
@@ -55,10 +55,11 @@ __host__ __device__ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end
   *n = end - start;
   // allocate memory for closes depending on gpu/cpu
   Close* closes;
-  if (gpu)
+  #ifdef __CUDA_ARCH__
     cudaMalloc((void **) &closes, sizeof(Close) * *n);
-  else
+  #else
     closes = new Close[*n];
+  #endif
   for (int i = 0; i < *n; ++i)
     closes[i] = this->closes[i + start];
   return closes;
@@ -84,15 +85,16 @@ float Asset::get_return(hlp::Date start_date, hlp::Date end_date) const
   return (v2 - v1) / v1;
 }
 
-__host__ __device__ float* Asset::get_returns(int *n, bool gpu) const
+__host__ __device__ float* Asset::get_returns(int *n) const
 {
   *n = this->size - 1;
   // allocate memory for returns
   float* returns;
-  if (gpu)
+  #ifdef __CUDA_ARCH__
     cudaMalloc((void **) &returns, sizeof(float) * *n);
-  else
+  #else
     returns = new float[*n];
+  #endif
   // compute all daily returns on that period
   for (int i = 0; i < *n; ++i) {
       float v1 = this->closes[i].value;
@@ -104,7 +106,7 @@ __host__ __device__ float* Asset::get_returns(int *n, bool gpu) const
 }
 
 __host__ __device__ float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
-        int* n, bool gpu) const
+        int* n) const
 {
   // get asset closes on this period (start->end)
   Close* closes = this->get_closes(start_date, end_date, n);
@@ -112,10 +114,11 @@ __host__ __device__ float* Asset::get_returns(hlp::Date start_date, hlp::Date en
   *n -= 1;
   // allocate memory for returns
   float* returns;
-  if (gpu)
+  #ifdef __CUDA_ARCH__
     cudaMalloc((void **) &returns, sizeof(float) * *n);
-  else
+  #else
     returns = new float[*n];
+  #endif
   // compute all daily returns on that period
   for (int i = 0; i < *n; ++i) {
     float v1 = closes[i].value;
@@ -123,18 +126,19 @@ __host__ __device__ float* Asset::get_returns(hlp::Date start_date, hlp::Date en
     returns[i] = (v2 - v1) / v1;
   }
   // free memory reserved for closes
-  if (gpu)
+  #ifdef __CUDA_ARCH__
     cudaFree(closes);
-  else
+  #else
     delete[] closes;
+  #endif
   return returns;
 }
 
-__host__ __device__ float Asset::get_volatility(bool gpu) const
+__host__ __device__ float Asset::get_volatility() const
 {
   int n;
   // get daily returns
-  float* returns = this->get_returns(&n, gpu);
+  float* returns = this->get_returns(&n);
   // compute average return
   float avg = 0;
   for (int i = 0; i < n; ++i)
@@ -146,19 +150,20 @@ __host__ __device__ float Asset::get_volatility(bool gpu) const
     var += pow(returns[i] - avg, 2);
   var /= n;
   // free memory of daily returns
-  if (gpu)
+  #ifdef __CUDA_ARCH__
     cudaFree(returns);
-  else
+  #else
     delete[] returns;
+  #endif
   // return volatility: sqrt(variance)
   return sqrtf(var);
 }
 
-__host__ __device__ float Asset::get_volatility(hlp::Date start_date, hlp::Date end_date, bool gpu) const
+__host__ __device__ float Asset::get_volatility(hlp::Date start_date, hlp::Date end_date) const
 {
   int n;
   // get dayly returns
-  float* returns = this->get_returns(start_date, end_date, &n, gpu);
+  float* returns = this->get_returns(start_date, end_date, &n);
   // compute average return
   float avg = 0;
   for (int i = 0; i < n; ++i)
@@ -170,10 +175,11 @@ __host__ __device__ float Asset::get_volatility(hlp::Date start_date, hlp::Date 
     var += pow(returns[i] - avg, 2);
   var /= n;
   // free memory of daily returns
-  if (gpu)
+  #ifdef __CUDA_ARCH__
     cudaFree(returns);
-  else
+  #else
     delete[] returns;
+  #endif
   // return volatility: sqrt(variance)
   return sqrtf(var);
 }

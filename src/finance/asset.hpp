@@ -6,7 +6,7 @@
 namespace fin
 {
 
-struct close
+struct Close
 {
   hlp::Date date;
   float value;
@@ -18,23 +18,24 @@ public:
   Asset(int id);
   ~Asset() = default;
 
-  void set_closes(std::vector<close> closes);
+  void set_closes(std::vector<Close> closes);
 
-  std::vector<close> get_closes() const;
-  std::vector<close> get_closes(hlp::Date start_date, hlp::Date end_date) const;
+  Close* get_closes() const;
+  Close* get_closes(hlp::Date start_date, hlp::Date end_date, int *n) const;
 
   float get_return() const;
   float get_return(hlp::Date start_date, hlp::Date end_date) const;
-  std::vector<float> get_returns() const;
-  std::vector<float> get_returns(hlp::Date start_date, hlp::Date end_date) const;
-  float get_volatility() const; 
+  float* get_returns(int* n) const;
+  float* get_returns(hlp::Date start_date, hlp::Date end_date, int* n) const;
+  float get_volatility() const;
   float get_volatility(hlp::Date start_date, hlp::Date end_date) const;
 
 private:
   int id;
-  std::vector<close> closes;
+  int size;
+  Close* closes;
 
-  void sort_closes();
+  void sort_closes(std::vector<Close> closes);
 };
 
 }

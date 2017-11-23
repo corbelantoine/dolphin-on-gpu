@@ -38,6 +38,8 @@ private:
   int size;
   Asset** assets;
   float weights;
+
+  void check_error(cudaError_t err);
 };
 
 }

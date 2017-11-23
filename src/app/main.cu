@@ -1,10 +1,10 @@
 #include <iostream>
 #include <algorithm>
 
-#include "../helpers/date.hpp"
+#include "../helpers/date.cuh"
 #include "../parsing/parse.hpp"
-#include "../finance/portfolio.hpp"
-#include "../optimization/optimizer.hpp"
+#include "../finance/portfolio.cuh"
+#include "../optimization/optimizer.cuh"
 
 void print_ret_vol(std::vector<fin::Asset>& assets)
 {

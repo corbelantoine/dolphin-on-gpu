@@ -1,4 +1,4 @@
-#include "optimizer.hpp"
+#include "optimizer.cuh"
 
 
 namespace opt

@@ -1,4 +1,4 @@
-#include "portfolio.hpp"
+#include "portfolio.cuh"
 
 #include <math.h>
 #include <numeric>

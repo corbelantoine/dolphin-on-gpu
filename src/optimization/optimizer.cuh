@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../finance/portfolio.hpp"
+#include "../finance/portfolio.cuh"
 #include "../../lib/cvxgen/solver.hpp"
 
 #include <cstdio>

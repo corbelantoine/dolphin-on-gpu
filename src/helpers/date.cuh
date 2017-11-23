@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-#include <cstdio>
-#include <cstdlib>
-
 namespace hlp
 {
 
@@ -16,20 +13,20 @@ public:
   Date() = default;
   ~Date() = default;
 
-  __host__ __device__ int get_day() const;
-  __host__ __device__ int get_month() const;
-  __host__ __device__ int get_year() const;
+  int get_day() const;
+  int get_month() const;
+  int get_year() const;
 
-  __host__ __device__ void set_day(int day);
-  __host__ __device__ void set_month(int month);
-  __host__ __device__ void set_year(int year);
+  void set_day(int day);
+  void set_month(int month);
+  void set_year(int year);
 
-  __host__ __device__ bool operator<(const Date& d) const;
-  __host__ __device__ bool operator>(const Date& d) const;
-  __host__ __device__ bool operator<=(const Date& d) const;
-  __host__ __device__ bool operator>=(const Date& d) const;
-  __host__ __device__ bool operator==(const Date& d) const;
-  __host__ __device__ bool operator!=(const Date& d) const;
+  bool operator<(const Date& d) const;
+  bool operator>(const Date& d) const;
+  bool operator<=(const Date& d) const;
+  bool operator>=(const Date& d) const;
+  bool operator==(const Date& d) const;
+  bool operator!=(const Date& d) const;
 
 private:
   int year;

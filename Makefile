@@ -5,7 +5,7 @@ LIB=lib/cvxgen/ldl.cpp \
 	lib/cvxgen/solver.cpp \
 	lib/cvxgen/util.cpp 
 	
-SRC=src/app/main.cpp \
+SRC=src/app/main.cu \
     src/finance/asset.cu \
     src/finance/portfolio.cu \
     src/helpers/date.cu \

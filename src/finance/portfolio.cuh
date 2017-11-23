@@ -3,8 +3,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "asset.hpp"
-#include "../helpers/date.hpp"
+#include "asset.cuh"
+#include "../helpers/date.cuh"
 
 namespace fin
 {

@@ -11,7 +11,7 @@ namespace fin
 class Portfolio
 {
 public:
-  Portfolio(int size, bool gpu = false);
+  Portfolio(int size);
   ~Portfolio();
 
   // setters
@@ -35,10 +35,9 @@ public:
   void print_weights() const;
 
 private:
-  bool gpu;
   int size;
   Asset** assets;
-  float weights;
+  float* weights;
 
 };
 

@@ -9,46 +9,34 @@
 #include <iostream>
 #include <iomanip>
 
+#include <stdio.h>
+
 namespace fin
 {
 
-__host__ __device__ Portfolio::Portfolio(int size, bool gpu)
+__host__ __device__ Portfolio::Portfolio(int size)
 {
   this->size = size;
-  this->gpu = gpu;
-  if (gpu) {
+  #ifdef __CUDA_ARCH__ 
     // portfolio object is going to be used on gpu
-    cudaError_t err = cudaMalloc((void **) &(this->assets), sizeof(Asset*) * size);
-    check_error(err);
-    err = cudaMalloc((void **) &(this->weights), sizeof(float) * size);
-    check_error(err);
-  } else {
+    cudaMalloc((void **) &(this->assets), sizeof(Asset*) * size);
+    cudaMalloc((void **) &(this->weights), sizeof(float) * size);
+  #else 
     // portfolio object is going to be used on cpu
     this->assets = new Asset* [size];
     this->weights = new float [size];
-  }
+  #endif
 }
 
 __host__ __device__ Portfolio::~Portfolio()
 {
-  if (this->gpu) {
+  #ifdef __CUDA_ARCH__ 
     cudaFree(this->assets);
     cudaFree(this->weights);
-  } else {
+  #else 
     delete[] this->assets;
     delete[] this->weights;
-  }
-}
-
-__host__ void Portfolio::check_error(cudaError_t err)
-{
-  if (err != cudaSuccess) {
-    std::cerr << cudaGetErrorString(err)
-    << "in " << __FILE__
-    << "at line " << __LINE__
-    << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  #endif
 }
 
 __host__ __device__ int Portfolio::get_size() const
@@ -78,13 +66,18 @@ __host__ __device__ void Portfolio::set_weights(float* weights)
     for (int i = 0; i < this->size; ++i)
       this->weights[i] = weights[i]; // set weights
   else
-    throw std::invalid_argument("Weights must sum to 1");
+    printf("Weights must sum to 1");
 }
 
 
 __host__ __device__ float* Portfolio::get_returns(hlp::Date start_date, hlp::Date end_date) const
 {
-  float* returns[this->size];
+  float* returns; 
+  #ifdef __CUDA_ARCH__ 
+    cudaMalloc((void **) &(returns), sizeof(float) * this->size);
+  #else
+    returns = new float[this->size];
+  #endif
   for (int i = 0; i < this->size; ++i)
     returns[i] = this->assets[i]->get_return(start_date, end_date);
   return returns;
@@ -103,14 +96,19 @@ __host__ __device__ float Portfolio::get_return(hlp::Date start_date, hlp::Date 
 
 __host__ __device__ float* Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const
 {
-  float covariance[this->size * this->size];
-
+  float* covariance;
+  
+  #ifdef __CUDA_ARCH__ 
+    cudaMalloc((void **) &(covariance), sizeof(float) * this->size * this->size);
+  #else
+    covariance = new float[this->size * this->size];
+  #endif
   for (int i = 0; i < this->size; ++i) {
     for (int j = 0; j < this->size; ++j) {
       if (j < i) // covariance is symetric, just copy the other half
         covariance[i * this->size + j] = covariance[j * this->size + i];
       else {
-        // get dayly returns of assets i and j
+        // get daily returns of assets i and j
         int n;
         float* ri = this->assets[i]->get_returns(start_date, end_date, &n);
         float* rj = this->assets[j]->get_returns(start_date, end_date, &n);
@@ -130,6 +128,15 @@ __host__ __device__ float* Portfolio::get_covariance(hlp::Date start_date, hlp::
         for (int k = 0; k < n; ++k)
           covariance[i * this->size + j] += (ri[k] - ri_avg) * (rj[k] - rj_avg);
         covariance[i * this->size + j] /= n;
+        
+        // freeing ri and rj
+        #ifdef __CUDA_ARCH__ 
+            cudaFree(ri);
+            cudaFree(rj);
+        #else
+            delete[] ri;
+            delete[] rj;
+        #endif
       }
     }
   }
@@ -148,6 +155,12 @@ __host__ __device__ float Portfolio::get_volatility(hlp::Date start_date, hlp::D
       vol += wi * wj * cov[i * this->size + j];
     }
   }
+  //free covariance
+  #ifdef __CUDA_ARCH__ 
+    cudaFree(cov);
+  #else
+    delete[] cov;
+  #endif
   return sqrtf(vol);
 }
 
@@ -160,8 +173,7 @@ __host__ __device__ float Portfolio::get_sharp(hlp::Date start_date, hlp::Date e
 
 __host__ void Portfolio::print_weights() const
 {
-  int size = this->assets.size();
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < this->size; ++i) {
     float w = this->weights[i];
     std::cout << std::fixed << std::setprecision(2) << w << "|";
   }

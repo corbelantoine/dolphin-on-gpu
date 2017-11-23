@@ -21,9 +21,9 @@ void print_ret_vol(fin::Portfolio& p, hlp::Date& start_date, hlp::Date& end_date
             << std::endl;
 }
 
-fin::Portfolio get_random_portfolio(std::vector<fin::Asset>& assets, size_t n = 10)
+fin::Portfolio get_random_portfolio(std::vector<fin::Asset>& assets, size_t n = 20)
 {
-  fin::Portfolio p;
+  fin::Portfolio p(n);
 
   std::vector<std::size_t> tmp(assets.size());
   size_t k = 0;
@@ -31,9 +31,9 @@ fin::Portfolio get_random_portfolio(std::vector<fin::Asset>& assets, size_t n = 
   std::random_shuffle(tmp.begin(), tmp.end());
   std::vector<std::size_t> indices(tmp.begin(), tmp.begin() + n);
 
-  std::vector<fin::Asset*> p_assets(n);
-  std::vector<float> p_weights(n);
-  for (std::size_t i = 0; i != n; ++i)
+  fin::Asset* p_assets[n];
+  float p_weights[n];
+  for (int i = 0; i < n; ++i)
   {
     p_assets[i] = &assets[indices[i]];
     p_weights[i] = 1. / n;

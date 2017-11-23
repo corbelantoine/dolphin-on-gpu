@@ -12,7 +12,7 @@ class Portfolio
 {
 public:
   Portfolio(int size, bool gpu = false);
-  ~Portfolio() = default;
+  ~Portfolio();
 
   // setters
   void set_assets(Asset** assets);
@@ -40,7 +40,6 @@ private:
   Asset** assets;
   float weights;
 
-  void check_error(cudaError_t err);
 };
 
 }

@@ -68,7 +68,8 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
   int portfolio_idx = threadIdx.x + blockDim.x * blockIdx.x;
   if (portfolio_idx < nb_p) {
     // create portfolio
-    Asset* p_assets[k];
+    fin::Portfolio p = fin::Portfolio(k, true) 
+    fin::Asset* p_assets[k];
     float p_weights[k];
     for (int j = 0; j < k; ++j) {
       int asset_id = portfolio_assets[portfolio_idx * k + j];
@@ -76,12 +77,14 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
       p_assets[j] = &all_assets[asset_id];
     }
     // set portfolio assets and weights
-    d_portfolios[portfolio_idx].set_assets(p_assets);
-    d_portfolios[portfolio_idx].set_weights(p_weights);
+    p.set_assets(p_assets);
+    p.set_weights(p_weights);
     // optimize portfolio (get optimal weights)
-    optimize_portfolio(d_portfolios[portfolio_idx], d1, d2, 0);
+    optimize_portfolio(p, d1, d2, 0);
+    // save portfolio to shared memory
+    d_portfolios[portfolio_idx] = p
     // set portfolio sharp for further use
-    d_sharp[portfolio_idx] = d_portfolios[portfolio_idx].get_sharp(d1, d2);
+    d_sharp[portfolio_idx] = p.get_sharp(d1, d2);
   }
 }
 
@@ -89,7 +92,7 @@ __host__ fin::Portfolio get_optimal_portfolio(fin::Asset *h_assets, int *port_as
                                     hlp::Date& d1, hlp::Date& d2,
                                     int n, int nb_p, int k)
 {
-  fin::Portfolio h_portfolios[nb_p];
+  fin::Portfolio h_portfolios[nb_p]; //(k, false);
   fin::Portfolio *d_portfolios;
 
   float h_sharp[nb_p];

@@ -20,7 +20,7 @@ __host__ __device__ Portfolio::Portfolio(int size, bool gpu)
     // portfolio object is going to be used on gpu
     cudaError_t err = cudaMalloc((void **) &(this->assets), sizeof(Asset*) * size);
     check_error(err);
-    cudaError_t err = cudaMalloc((void **) &(this->weights), sizeof(float) * size);
+    err = cudaMalloc((void **) &(this->weights), sizeof(float) * size);
     check_error(err);
   } else {
     // portfolio object is going to be used on cpu

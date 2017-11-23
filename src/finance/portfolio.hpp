@@ -11,7 +11,7 @@ namespace fin
 class Portfolio
 {
 public:
-  Portfolio(int size, bool gpu = false) = default;
+  Portfolio(int size, bool gpu = false);
   ~Portfolio() = default;
 
   // setters

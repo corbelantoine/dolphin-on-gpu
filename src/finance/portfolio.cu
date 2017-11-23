@@ -12,12 +12,18 @@
 namespace fin
 {
 
-std::vector<Asset*> Portfolio::get_assets() const
+Portfolio::Portfolio(int size, bool gpu)
+{
+  this->size = size;
+  
+}
+
+Asset** Portfolio::get_assets() const
 {
   return this->assets;
 }
 
-void Portfolio::set_assets(std::vector<Asset*> assets)
+void Portfolio::set_assets(Asset** assets)
 {
   this->assets = assets;
 }

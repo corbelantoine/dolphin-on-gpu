@@ -9,20 +9,20 @@ namespace fin
 class Portfolio
 {
 public:
-  Portfolio() = default;
+  Portfolio(int size, bool gpu = false) = default;
   ~Portfolio() = default;
 
   // setters
-  void set_assets(std::vector<Asset*> assets);
-  void set_weights(std::vector<float> weights);
+  void set_assets(Asset** assets);
+  void set_weights(float* weights);
 
   // getters
-  std::vector<Asset*> get_assets() const;
-  std::vector<float> get_weights() const;
+  Asset** get_assets() const;
+  float* get_weights() const;
 
   // helpers to find optimal portfolio
-  std::vector<float> get_returns(hlp::Date start_date, hlp::Date end_date) const;
-  std::vector<float> get_covariance(hlp::Date start_date, hlp::Date end_date) const;
+  float* get_returns(hlp::Date start_date, hlp::Date end_date) const;
+  float* get_covariance(hlp::Date start_date, hlp::Date end_date) const;
 
   // metrics getters
   float get_return(hlp::Date start_date, hlp::Date end_date) const;
@@ -32,8 +32,10 @@ public:
   void print_weights() const;
 
 private:
-  std::vector<Asset*> assets;
-  std::vector<float> weights;
+  bool gpu;
+  int size;
+  Asset** assets;
+  float weights;
 };
 
 }

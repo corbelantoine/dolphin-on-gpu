@@ -6,8 +6,9 @@
 
 /* Filename: solver.c. */
 /* Description: Main solver file. */
-#include "solver.hpp"
+#include "solver.cuh"
 
+CUDA_CALLABLE_MEMBER
 double eval_gap(Workspace& work) {
   int i;
   double gap;
@@ -17,6 +18,7 @@ double eval_gap(Workspace& work) {
   return gap;
 }
 
+CUDA_CALLABLE_MEMBER
 void set_defaults(Settings& settings) {
   settings.resid_tol = 1e-6;
   settings.eps = 1e-4;
@@ -31,6 +33,7 @@ void set_defaults(Settings& settings) {
   settings.kkt_reg = 1e-7;
 }
 
+CUDA_CALLABLE_MEMBER
 void setup_pointers(Workspace& work, Vars& vars) {
   work.y = work.x + 20;
   work.s = work.x + 21;
@@ -38,10 +41,12 @@ void setup_pointers(Workspace& work, Vars& vars) {
   vars.Weights = work.x + 0;
 }
 
+CUDA_CALLABLE_MEMBER
 void setup_indexing(Workspace& work, Vars& vars) {
   setup_pointers(work, vars);
 }
 
+CUDA_CALLABLE_MEMBER
 void set_start(Workspace& work, Settings& settings) {
   int i;
   for (i = 0; i < 20; i++)
@@ -54,6 +59,7 @@ void set_start(Workspace& work, Settings& settings) {
     work.z[i] = settings.z_init;
 }
 
+CUDA_CALLABLE_MEMBER
 double eval_objv(Workspace& work, Params& params) {
   int i;
   double objv;
@@ -69,6 +75,7 @@ double eval_objv(Workspace& work, Params& params) {
   return objv;
 }
 
+CUDA_CALLABLE_MEMBER
 void fillrhs_aff(Workspace& work, Params& params) {
   int i;
   double *r1, *r2, *r3, *r4;
@@ -97,6 +104,7 @@ void fillrhs_aff(Workspace& work, Params& params) {
     r4[i] += work.b[i];
 }
 
+CUDA_CALLABLE_MEMBER
 void fillrhs_cc(Workspace& work) {
   int i;
   double *r2;
@@ -144,6 +152,7 @@ void fillrhs_cc(Workspace& work) {
     r2[i] = work.s_inv[i]*(smu - ds_aff[i]*dz_aff[i]);
 }
 
+CUDA_CALLABLE_MEMBER
 void refine(double *target, double *var, Workspace& work, Settings& settings) {
   int i, j;
   double *residual = work.buffer;
@@ -189,6 +198,7 @@ void refine(double *target, double *var, Workspace& work, Settings& settings) {
 #endif
 }
 
+CUDA_CALLABLE_MEMBER
 double calc_ineq_resid_squared(Workspace& work) {
   /* Calculates the norm ||-Gx - s + h||. */
   double norm2_squared;
@@ -205,6 +215,7 @@ double calc_ineq_resid_squared(Workspace& work) {
   return norm2_squared;
 }
 
+CUDA_CALLABLE_MEMBER
 double calc_eq_resid_squared(Workspace& work) {
   /* Calculates the norm ||-Ax + b||. */
   double norm2_squared;
@@ -221,6 +232,7 @@ double calc_eq_resid_squared(Workspace& work) {
   return norm2_squared;
 }
 
+CUDA_CALLABLE_MEMBER
 void better_start(Workspace& work, Settings& settings, Params& params) {
   /* Calculates a better starting point, using a similar approach to CVXOPT. */
   /* Not yet speed optimized. */
@@ -276,6 +288,7 @@ void better_start(Workspace& work, Settings& settings, Params& params) {
   }
 }
 
+CUDA_CALLABLE_MEMBER
 void fillrhs_start(Workspace& work) {
   /* Fill rhs with (-q, 0, h, b). */
   int i;
@@ -294,6 +307,7 @@ void fillrhs_start(Workspace& work) {
     r4[i] = work.b[i];
 }
 
+CUDA_CALLABLE_MEMBER
 long solve(Workspace& work, Settings& settings, Params& params, Vars& vars) {
   int i;
   int iter;

@@ -28,6 +28,12 @@
 #define pm(A, m, n) printmatrix(#A, A, m, n, 1)
 #endif
 
+#ifdef __CUDACC__
+#define CUDA_CALLABLE_MEMBER __host__ __device__
+#else
+#define CUDA_CALLABLE_MEMBER
+#endif
+
 struct Params {
   double Sigma[400];
   double lambda[1];
@@ -91,43 +97,39 @@ struct Settings {
 
 
 /* Function definitions in ldl.c: */
-void ldl_solve(double *target, double *var, Workspace& work, Settings& settings);
-void ldl_factor(Workspace& work, Settings& settings);
-double check_factorization(Workspace& work);
-void matrix_multiply(double *result, double *source, Workspace& work, Settings& settings);
-double check_residual(double *target, double *multiplicand, Workspace& work, Settings& settings);
-void fill_KKT(Workspace& work, Params& params);
+CUDA_CALLABLE_MEMBER void ldl_solve(double *target, double *var, Workspace& work, Settings& settings);
+CUDA_CALLABLE_MEMBER void ldl_factor(Workspace& work, Settings& settings);
+CUDA_CALLABLE_MEMBER double check_factorization(Workspace& work);
+CUDA_CALLABLE_MEMBER void matrix_multiply(double *result, double *source, Workspace& work, Settings& settings);
+CUDA_CALLABLE_MEMBER double check_residual(double *target, double *multiplicand, Workspace& work, Settings& settings);
+CUDA_CALLABLE_MEMBER void fill_KKT(Workspace& work, Params& params);
 
 /* Function definitions in matrix_support.c: */
-void multbymA(double *lhs, double *rhs);
-void multbymAT(double *lhs, double *rhs);
-void multbymG(double *lhs, double *rhs);
-void multbymGT(double *lhs, double *rhs);
-void multbyP(double *lhs, double *rhs, Params& params);
-void fillq(Workspace& work, Params& params);
-void fillh(Workspace& work);
-void fillb(Workspace& work);
-void pre_ops(void);
+CUDA_CALLABLE_MEMBER void multbymA(double *lhs, double *rhs);
+CUDA_CALLABLE_MEMBER void multbymAT(double *lhs, double *rhs);
+CUDA_CALLABLE_MEMBER void multbymG(double *lhs, double *rhs);
+CUDA_CALLABLE_MEMBER void multbymGT(double *lhs, double *rhs);
+CUDA_CALLABLE_MEMBER void multbyP(double *lhs, double *rhs, Params& params);
+CUDA_CALLABLE_MEMBER void fillq(Workspace& work, Params& params);
+CUDA_CALLABLE_MEMBER void fillh(Workspace& work);
+CUDA_CALLABLE_MEMBER void fillb(Workspace& work);
+CUDA_CALLABLE_MEMBER void pre_ops(void);
 
 /* Function definitions in solver.c: */
-double eval_gap(Workspace& work);
-void set_defaults(Settings& settings);
-void setup_pointers(Workspace& work, Vars& vars);
-void setup_indexing(Workspace& work, Vars& vars);
-void set_start(Workspace& work, Settings& settings);
-double eval_objv(Workspace& work, Params& params);
-void fillrhs_aff(Workspace& work, Params& params);
-void fillrhs_cc(Workspace& work);
-void refine(double *target, double *var, Workspace& work, Settings& settings);
-double calc_ineq_resid_squared(Workspace& work);
-double calc_eq_resid_squared(Workspace& work);
-void better_start(Workspace& work, Settings& settings, Params& params);
-void fillrhs_start(Workspace& work);
-long solve(Workspace& work, Settings& settings, Params& params, Vars& vars);
-
-/* Function definitions in testsolver.c: */
-int main(int argc, char **argv);
-void load_default_data(Params& params);
+CUDA_CALLABLE_MEMBER double eval_gap(Workspace& work);
+CUDA_CALLABLE_MEMBER void set_defaults(Settings& settings);
+CUDA_CALLABLE_MEMBER void setup_pointers(Workspace& work, Vars& vars);
+CUDA_CALLABLE_MEMBER void setup_indexing(Workspace& work, Vars& vars);
+CUDA_CALLABLE_MEMBER void set_start(Workspace& work, Settings& settings);
+CUDA_CALLABLE_MEMBER double eval_objv(Workspace& work, Params& params);
+CUDA_CALLABLE_MEMBER void fillrhs_aff(Workspace& work, Params& params);
+CUDA_CALLABLE_MEMBER void fillrhs_cc(Workspace& work);
+CUDA_CALLABLE_MEMBER void refine(double *target, double *var, Workspace& work, Settings& settings);
+CUDA_CALLABLE_MEMBER double calc_ineq_resid_squared(Workspace& work);
+CUDA_CALLABLE_MEMBER double calc_eq_resid_squared(Workspace& work);
+CUDA_CALLABLE_MEMBER void better_start(Workspace& work, Settings& settings, Params& params);
+CUDA_CALLABLE_MEMBER void fillrhs_start(Workspace& work);
+CUDA_CALLABLE_MEMBER long solve(Workspace& work, Settings& settings, Params& params, Vars& vars);
 
 /* Function definitions in util.c: */
 void tic(void);

@@ -6,8 +6,9 @@
 
 /* Filename: ldl.c. */
 /* Description: Basic test harness for solver.c. */
-#include "solver.hpp"
+#include "solver.cuh"
 /* Be sure to place ldl_solve first, so storage schemes are defined by it. */
+CUDA_CALLABLE_MEMBER
 void ldl_solve(double *target, double *var, Workspace& work, Settings& settings) {
   int i;
   /* Find var = (L*diag(work.d)*L') \ target, then unpermute. */
@@ -329,6 +330,7 @@ void ldl_solve(double *target, double *var, Workspace& work, Settings& settings)
 #endif
 }
 
+CUDA_CALLABLE_MEMBER
 void ldl_factor(Workspace& work, Settings& settings)  {
   work.d[0] = work.KKT[0];
   if (work.d[0] < 0)
@@ -1623,6 +1625,7 @@ void ldl_factor(Workspace& work, Settings& settings)  {
 #endif
 }
 
+CUDA_CALLABLE_MEMBER
 double check_factorization(Workspace& work) {
   /* Returns the squared Frobenius norm of A - L*D*L'. */
   double temp, residual;
@@ -2411,6 +2414,7 @@ double check_factorization(Workspace& work) {
   return residual;
 }
 
+CUDA_CALLABLE_MEMBER
 void matrix_multiply(double *result, double *source, Workspace& work, Settings& settings) {
   /* Finds result = A*source. */
   result[0] = work.KKT[180]*source[0]+work.KKT[181]*source[1]+work.KKT[182]*source[2]+work.KKT[183]*source[3]+work.KKT[184]*source[4]+work.KKT[185]*source[5]+work.KKT[186]*source[6]+work.KKT[187]*source[7]+work.KKT[188]*source[8]+work.KKT[189]*source[9]+work.KKT[190]*source[10]+work.KKT[191]*source[11]+work.KKT[192]*source[12]+work.KKT[193]*source[13]+work.KKT[194]*source[14]+work.KKT[195]*source[15]+work.KKT[196]*source[16]+work.KKT[197]*source[17]+work.KKT[198]*source[18]+work.KKT[199]*source[19]+work.KKT[81]*source[60]+work.KKT[121]*source[80]+work.KKT[160]*source[100];
@@ -2516,6 +2520,7 @@ void matrix_multiply(double *result, double *source, Workspace& work, Settings& 
   result[100] = work.KKT[160]*source[0]+work.KKT[161]*source[1]+work.KKT[162]*source[2]+work.KKT[163]*source[3]+work.KKT[164]*source[4]+work.KKT[165]*source[5]+work.KKT[166]*source[6]+work.KKT[167]*source[7]+work.KKT[168]*source[8]+work.KKT[169]*source[9]+work.KKT[170]*source[10]+work.KKT[171]*source[11]+work.KKT[172]*source[12]+work.KKT[173]*source[13]+work.KKT[174]*source[14]+work.KKT[175]*source[15]+work.KKT[176]*source[16]+work.KKT[177]*source[17]+work.KKT[178]*source[18]+work.KKT[179]*source[19];
 }
 
+CUDA_CALLABLE_MEMBER
 double check_residual(double *target, double *multiplicand, Workspace& work, Settings& settings) {
   /* Returns the squared 2-norm of lhs - A*rhs. */
   /* Reuses v to find the residual. */
@@ -2529,6 +2534,7 @@ double check_residual(double *target, double *multiplicand, Workspace& work, Set
   return residual;
 }
 
+CUDA_CALLABLE_MEMBER
 void fill_KKT(Workspace& work, Params& params) {
   work.KKT[180] = 2*params.Sigma[0];
   work.KKT[181] = 2*params.Sigma[20];

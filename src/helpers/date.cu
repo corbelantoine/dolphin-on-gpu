@@ -3,7 +3,7 @@
 namespace hlp
 {
 
-CUDA_CALLABLE_MEMBER
+// CUDA_CALLABLE_MEMBER
 Date::Date(char* str_date)
 {
   if (3 != sscanf(str_date, "%d-%d-%d;", &(this->year), &(this->month), &(this->day))) {

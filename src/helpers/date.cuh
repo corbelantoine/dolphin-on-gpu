@@ -17,9 +17,9 @@ class Date
 {
 
 public:
-  CUDA_CALLABLE_MEMBER Date(char* str_date);
-  CUDA_CALLABLE_MEMBER Date() = default;
-  CUDA_CALLABLE_MEMBER ~Date() = default;
+  Date(char* str_date);
+  Date() = default;
+  ~Date() = default;
 
   CUDA_CALLABLE_MEMBER int get_day() const;
   CUDA_CALLABLE_MEMBER int get_month() const;

@@ -4,13 +4,18 @@ LIB=lib/cvxgen/ldl.cpp \
 	lib/cvxgen/matrix_support.cpp \
 	lib/cvxgen/solver.cpp \
 	lib/cvxgen/util.cpp 
-	
-SRC=src/app/main.cu \
-    src/finance/asset.cu \
+
+SRC=src/finance/asset.cu \
     src/finance/portfolio.cu \
     src/helpers/date.cu \
-    src/parsing/parse.cpp \
 	src/optimization/optimizer.cu
+
+# SRC=src/app/main.cu \
+#     src/finance/asset.cu \
+#     src/finance/portfolio.cu \
+#     src/helpers/date.cu \
+#     src/parsing/parse.cpp \
+# 	src/optimization/optimizer.cu
 
 # UNIT=src/tests/unit_test.cc
 

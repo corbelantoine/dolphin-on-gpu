@@ -99,7 +99,7 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
   }
 }
 
-__host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *port_assets,
+__host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *map_portfolio_assets,
                                     hlp::Date& d1, hlp::Date& d2,
                                     int nb_assets, int nb_p, int p_size)
 {
@@ -113,7 +113,7 @@ __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *por
 
   // copy values to cuda constants (cpu to gpu)
   cudaMemcpyToSymbol(all_assets, h_assets, sizeof(fin::Asset) * nb_assets);
-  cudaMemcpyToSymbol(portfolio_assets, port_assets, sizeof(int) * nb_p * p_size);
+  cudaMemcpyToSymbol(portfolio_assets, map_portfolio_assets, sizeof(int) * nb_p * p_size);
   // cuda malloc device portfolios and sharps
   cudaError_t err = cudaMalloc((void **) &d_portfolios, sizeof(fin::Portfolio) * nb_p);
   check_error(err);
@@ -152,7 +152,7 @@ __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *por
   return optimal_portfolio;
 }
 
-__host__ fin::Portfolio get_optimal_portfolio_cpu(fin::Asset *assets, int *p_assets,
+__host__ fin::Portfolio get_optimal_portfolio_cpu(fin::Asset *h_assets, int *map_portfolio_assets,
                                     hlp::Date& d1, hlp::Date& d2,
                                     int nb_assets, int nb_p, int p_size)
 {
@@ -168,9 +168,9 @@ __host__ fin::Portfolio get_optimal_portfolio_cpu(fin::Asset *assets, int *p_ass
     float p_weights[p_size];
     for (int j = 0; j < p_size; ++j) {
       // get portfolio assets and weights
-      int asset_id = p_assets[i * p_size + j];
+      int asset_id = map_portfolio_assets[i * p_size + j];
       p_weights[j] = 1. / p_size;
-      p_assets[j] = &all_assets[asset_id];
+      p_assets[j] = &h_assets[asset_id];
     }
     // set portfolio assets and weights
     p.set_assets(p_assets);

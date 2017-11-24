@@ -24,7 +24,7 @@ public:
 
   void set_closes(std::vector<Close> closes);
 
-  Close* get_closes() const;
+  Close* get_closes(int *n) const;
 __host__ __device__  Close* get_closes(hlp::Date start_date, hlp::Date end_date, 
           int *n) const;
 

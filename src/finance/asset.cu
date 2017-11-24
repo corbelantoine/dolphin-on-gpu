@@ -33,8 +33,9 @@ void Asset::set_closes(std::vector<Close> closes)
     this->closes[i] = closes[i];
 }
 
-Close* Asset::get_closes() const
+Close* Asset::get_closes(int *n) const
 {
+  *n = this->size;
   return this->closes;
 }
 

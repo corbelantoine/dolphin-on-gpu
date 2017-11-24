@@ -17,10 +17,11 @@ std::vector<fin::Asset> getAssets(hlp::Date& start_date, hlp::Date& end_date)
         while (ent) {
             if (std::string(ent->d_name).compare(0, 1 , ".")) {
                 auto asset = parse(std::string("data/cleaned/").append(ent->d_name));
-                auto closes = asset.get_closes();
-                if (!closes->empty()
+                int size = 0;
+                auto closes = asset.get_closes(&size);
+                if (size != 0
                   && closes[0].date <= start_date
-                  && closes[closes->size() - 1].date >= end_date)
+                  && closes[size - 1].date >= end_date)
                     ret.push_back(asset);
             }
             ent = readdir(dir);

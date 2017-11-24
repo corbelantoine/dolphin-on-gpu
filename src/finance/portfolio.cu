@@ -18,27 +18,15 @@ CUDA_CALLABLE_MEMBER
 Portfolio::Portfolio(int size)
 {
   this->size = size;
-  #ifdef __CUDA_ARCH__
-    // portfolio object is going to be used on gpu
-    cudaMalloc((void **) &(this->assets), sizeof(Asset*) * size);
-    cudaMalloc((void **) &(this->weights), sizeof(float) * size);
-  #else
-    // portfolio object is going to be used on cpu
-    this->assets = new Asset* [size];
-    this->weights = new float [size];
-  #endif
+  this->assets = new Asset* [size];
+  this->weights = new float [size];
 }
 
 CUDA_CALLABLE_MEMBER
 Portfolio::~Portfolio()
 {
-  #ifdef __CUDA_ARCH__
-    cudaFree(this->assets);
-    cudaFree(this->weights);
-  #else
-    delete[] this->assets;
-    delete[] this->weights;
-  #endif
+  delete[] this->assets;
+  delete[] this->weights;
 }
 
 CUDA_CALLABLE_MEMBER
@@ -79,12 +67,9 @@ void Portfolio::set_weights(float* weights)
 CUDA_CALLABLE_MEMBER
 float* Portfolio::get_returns(hlp::Date start_date, hlp::Date end_date) const
 {
-  float* returns;
-  #ifdef __CUDA_ARCH__
-    cudaMalloc((void **) &(returns), sizeof(float) * this->size);
-  #else
-    returns = new float[this->size];
-  #endif
+  // allocate memory for daily returns
+  float* returns = new float[this->size];
+  // set daily returns
   for (int i = 0; i < this->size; ++i)
     returns[i] = this->assets[i]->get_return(start_date, end_date);
   return returns;
@@ -105,13 +90,7 @@ float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
 CUDA_CALLABLE_MEMBER
 float* Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const
 {
-  float* covariance;
-
-  #ifdef __CUDA_ARCH__
-    cudaMalloc((void **) &(covariance), sizeof(float) * this->size * this->size);
-  #else
-    covariance = new float[this->size * this->size];
-  #endif
+  float* covariance = new float[this->size * this->size];
   for (int i = 0; i < this->size; ++i) {
     for (int j = 0; j < this->size; ++j) {
       if (j < i) // covariance is symetric, just copy the other half
@@ -139,13 +118,8 @@ float* Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const
         covariance[i * this->size + j] /= n;
 
         // freeing ri and rj
-        #ifdef __CUDA_ARCH__
-            cudaFree(ri);
-            cudaFree(rj);
-        #else
-            delete[] ri;
-            delete[] rj;
-        #endif
+        delete[] ri;
+        delete[] rj;
       }
     }
   }
@@ -166,11 +140,7 @@ float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const
     }
   }
   //free covariance
-  #ifdef __CUDA_ARCH__
-    cudaFree(cov);
-  #else
-    delete[] cov;
-  #endif
+  delete[] cov;
   return sqrtf(vol);
 }
 

@@ -7,6 +7,8 @@
 #endif
 
 #include <stdio.h>
+#include <iostream>
+
 
 namespace hlp
 {

@@ -18,7 +18,7 @@ BIN=main
 
 # UBIN=unit
 
-CPPFLAGS=-lcuda -lcublas
+CPPFLAGS=-lcuda -lcublas --device-c|-dc
 
 all:
 	$(CPP) $(LIB) $(SRC) $(CPPFLAGS) -o $(BIN)

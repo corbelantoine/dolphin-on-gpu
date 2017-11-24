@@ -53,7 +53,7 @@ fin::Asset parse(std::string path){
 
     for (int i; i < j.size(); i++) {
         fin::Close p = fin::Close();
-        p.date = hlp::Date(j[i][0].get<std::string>());
+        p.date = hlp::Date(j[i][0].get<char*>());
         p.value = j[i][1];
         vect.push_back(p);
     }

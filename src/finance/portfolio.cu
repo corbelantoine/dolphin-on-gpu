@@ -67,6 +67,7 @@ void Portfolio::set_weights(float* weights)
 CUDA_CALLABLE_MEMBER
 float* Portfolio::get_returns(hlp::Date start_date, hlp::Date end_date) const
 {
+  // returns a list of return for each asset
   // allocate memory for daily returns
   float* returns = new float[this->size];
   // set daily returns

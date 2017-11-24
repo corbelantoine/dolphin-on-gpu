@@ -15,6 +15,16 @@ namespace fin
 {
 
 CUDA_CALLABLE_MEMBER
+Portfolio::Portfolio()
+{
+  int size = 20;
+  this->size = size;
+  this->assets = new Asset* [size];
+  this->weights = new float [size];
+}
+
+
+CUDA_CALLABLE_MEMBER
 Portfolio::Portfolio(int size)
 {
   this->size = size;

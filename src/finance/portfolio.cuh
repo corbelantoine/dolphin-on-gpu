@@ -17,6 +17,7 @@ namespace fin
 class Portfolio
 {
 public:
+  CUDA_CALLABLE_MEMBER Portfolio();
   CUDA_CALLABLE_MEMBER Portfolio(int size);
   CUDA_CALLABLE_MEMBER ~Portfolio();
 

@@ -65,8 +65,8 @@ __device__ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& 
   p.set_weights(weights);
 
   // free cov and ret
-  cudaFree(cov);
-  cudaFree(returns);
+  delete[] cov;
+  delete[] returns;
 }
 
 __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* d_sharp,
@@ -77,9 +77,10 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
   int portfolio_idx = threadIdx.x + blockDim.x * blockIdx.x;
   if (portfolio_idx < nb_p) {
     // create portfolio
-    fin::Portfolio p = fin::Portfolio(p_size);
-    fin::Asset* p_assets[p_size];
-    float p_weights[p_size];
+    const int size = 20;
+    fin::Portfolio p = fin::Portfolio();
+    fin::Asset* p_assets[size];
+    float p_weights[size];
     for (int j = 0; j < p_size; ++j) {
       // portfolio_assets is a global __constant__
       int asset_id = portfolio_assets[portfolio_idx * p_size + j];
@@ -102,7 +103,7 @@ __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *map
                                     hlp::Date& d1, hlp::Date& d2,
                                     const int nb_assets, const int nb_p, const int p_size)
 {
-  fin::Portfolio h_portfolios[nb_p](p_size);
+  fin::Portfolio h_portfolios[nb_p];
   fin::Portfolio *d_portfolios;
 
   float h_sharp[nb_p];

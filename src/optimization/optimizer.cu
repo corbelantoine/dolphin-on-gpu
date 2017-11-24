@@ -72,18 +72,19 @@ __device__ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& 
 
 __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* d_sharp,
                                 hlp::Date& d1, hlp::Date& d2,
-                                int n, int nb_p, int k)
+                                int nb_p, int p_size)
 {
+  // get portfolio index
   int portfolio_idx = threadIdx.x + blockDim.x * blockIdx.x;
   if (portfolio_idx < nb_p) {
     // create portfolio
-    fin::Portfolio p = fin::Portfolio(k);
-    fin::Asset* p_assets[k];
-    float p_weights[k];
-    for (int j = 0; j < k; ++j) {
+    fin::Portfolio p = fin::Portfolio(p_size);
+    fin::Asset* p_assets[p_size];
+    float p_weights[p_size];
+    for (int j = 0; j < p_size; ++j) {
       // portfolio_assets is a global __constant__
-      int asset_id = portfolio_assets[portfolio_idx * k + j];
-      p_weights[j] = 1. / k;
+      int asset_id = portfolio_assets[portfolio_idx * p_size + j];
+      p_weights[j] = 1. / p_size;
       p_assets[j] = &all_assets[asset_id];
     }
     // set portfolio assets and weights
@@ -100,9 +101,9 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
 
 __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *port_assets,
                                     hlp::Date& d1, hlp::Date& d2,
-                                    int n, int nb_p, int k)
+                                    int nb_assets, int nb_p, int p_size)
 {
-  fin::Portfolio h_portfolios[nb_p]; // Maybe we need to init size (k);
+  fin::Portfolio h_portfolios[nb_p]; // Maybe we need to init size (p_size);
   fin::Portfolio *d_portfolios;
 
   float h_sharp[nb_p];
@@ -111,8 +112,8 @@ __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *por
   fin::Portfolio optimal_portfolio;
 
   // copy values to cuda constants (cpu to gpu)
-  cudaMemcpyToSymbol(all_assets, h_assets, sizeof(fin::Asset) * n);
-  cudaMemcpyToSymbol(portfolio_assets, port_assets, sizeof(int) * nb_p * k);
+  cudaMemcpyToSymbol(all_assets, h_assets, sizeof(fin::Asset) * nb_assets);
+  cudaMemcpyToSymbol(portfolio_assets, port_assets, sizeof(int) * nb_p * p_size);
   // cuda malloc device portfolios and sharps
   cudaError_t err = cudaMalloc((void **) &d_portfolios, sizeof(fin::Portfolio) * nb_p);
   check_error(err);
@@ -120,11 +121,10 @@ __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *por
   check_error(err);
 
   // TODO adapt grid and block size
-  dim3 DimGrid(((n - 1) / 256, 1, 1));
+  dim3 DimGrid(((nb_assets - 1) / 256, 1, 1));
   dim3 DimBlock(256, 1, 1);
   optimize_portfolios_kernel<<<DimGrid, DimBlock>>>(d_portfolios, d_sharp,
-                                                    d1, d2,
-                                                    n, nb_p, k);
+                                                    d1, d2, nb_p, p_size);
 
   // copy optimized portfolios and their sharp values from gpu to cpu
   cudaMemcpy(h_portfolios, d_portfolios, sizeof(fin::Portfolio) * nb_p, cudaMemcpyDeviceToHost);
@@ -136,11 +136,12 @@ __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *por
   // get portfolio with max sharp
   int max_idx = 0;
   float max_sharp = h_sharp[0];
-  for (int i = 0; i < nb_p; ++i)
+  for (int i = 0; i < nb_p; ++i) {
     if (h_sharp[i] > max_sharp) {
       max_sharp = h_sharp[i];
       max_idx = i;
     }
+  }
   // set optimal portfolio
   optimal_portfolio = h_portfolios[max_idx];
 
@@ -183,7 +184,7 @@ __host__ fin::Portfolio get_optimal_portfolio_cpu(fin::Asset *assets, int *p_ass
       optimal_portfolio = p;
     }
   }
-  
+
   return optimal_portfolio;
 }
 

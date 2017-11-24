@@ -39,7 +39,7 @@ __device__ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& 
   int p_size = 20;
 
   // setting the quadratic problem
-  // set Sigma to the covaraince matrix
+  // set Sigma to the covariance matrix
   float* cov = p.get_covariance(d1, d2);
   int cov_size = p_size ** p_size;
   for (int i = 0; i < cov_size; ++i)

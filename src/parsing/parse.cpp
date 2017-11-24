@@ -37,7 +37,7 @@ fin::Asset parse(std::string path){
     std::ifstream inFile;
     std::string data;
     fin::Asset asset(-1);
-    std::vector<fin::close> vect;
+    std::vector<fin::Close> vect;
 
     // TODO parse id
 
@@ -51,7 +51,7 @@ fin::Asset parse(std::string path){
     inFile >> j;
 
     for (int i; i < j.size(); i++) {
-        fin::close p = fin::close();
+        fin::Close p = fin::Close();
         p.date = hlp::Date(j[i][0].get<std::string>());
         p.value = j[i][1];
         vect.push_back(p);

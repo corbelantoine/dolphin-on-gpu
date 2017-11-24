@@ -26,7 +26,7 @@ __host__ void check_error(cudaError_t err)
   }
 }
 
-__device__ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2, int verbose)
+__host__ __device__ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hlp::Date& d2, int verbose)
 {
   Workspace work;
   Settings settings;
@@ -144,10 +144,6 @@ __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *map
   }
   // set optimal portfolio
   optimal_portfolio = h_portfolios[max_idx];
-
-  // free host memory
-  delete[] h_portfolios;
-  delete[] h_sharp;
 
   return optimal_portfolio;
 }

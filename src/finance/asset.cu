@@ -8,17 +8,20 @@
 namespace fin
 {
 
+CUDA_CALLABLE_MEMBER
 Asset::Asset(int id)
 {
   this->id = id;
   this->closes = 0;
 }
 
+CUDA_CALLABLE_MEMBER
 Asset::~Asset()
 {
   if (this->closes != 0)
     delete[] this->closes;
 }
+
 
 void Asset::set_closes(std::vector<Close> closes)
 {
@@ -33,13 +36,14 @@ void Asset::set_closes(std::vector<Close> closes)
     this->closes[i] = closes[i];
 }
 
+CUDA_CALLABLE_MEMBER
 Close* Asset::get_closes(int *n) const
 {
   *n = this->size;
   return this->closes;
 }
 
-__host__ __device__
+CUDA_CALLABLE_MEMBER
 Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
         int *n) const
 {
@@ -68,7 +72,7 @@ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
   return closes;
 }
 
-__host__ __device__
+CUDA_CALLABLE_MEMBER
 float Asset::get_return() const
 {
   float v1 = this->closes[0].value;
@@ -76,7 +80,7 @@ float Asset::get_return() const
   return (v2 - v1) / v1;
 }
 
-__host__ __device__
+CUDA_CALLABLE_MEMBER
 float Asset::get_return(hlp::Date start_date, hlp::Date end_date) const
 {
   float v1, v2;
@@ -90,7 +94,7 @@ float Asset::get_return(hlp::Date start_date, hlp::Date end_date) const
   return (v2 - v1) / v1;
 }
 
-__host__ __device__
+CUDA_CALLABLE_MEMBER
 float* Asset::get_returns(int *n) const
 {
   *n = this->size - 1;
@@ -111,7 +115,7 @@ float* Asset::get_returns(int *n) const
   return returns;
 }
 
-__host__ __device__
+CUDA_CALLABLE_MEMBER
 float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
         int* n) const
 {
@@ -141,7 +145,7 @@ float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
   return returns;
 }
 
-__host__ __device__
+CUDA_CALLABLE_MEMBER
 float Asset::get_volatility() const
 {
   int n;
@@ -167,7 +171,7 @@ float Asset::get_volatility() const
   return sqrtf(var);
 }
 
-__host__ __device__
+CUDA_CALLABLE_MEMBER
 float Asset::get_volatility(hlp::Date start_date, hlp::Date end_date) const
 {
   int n;
@@ -199,6 +203,7 @@ bool date_less(Close a, Close b)
   return a.date < b.date;
 }
 
+// sort closes by date
 void Asset::sort_closes(std::vector<Close> closes)
 {
   std::sort(closes.begin(), closes.end(), date_less);

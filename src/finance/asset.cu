@@ -59,13 +59,8 @@ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
   }
   // set size of return array
   *n = end - start;
-  // allocate memory for closes depending on gpu/cpu
-  Close* closes;
-  #ifdef __CUDA_ARCH__
-    cudaMalloc((void **) &closes, sizeof(Close) * *n);
-  #else
-    closes = new Close[*n];
-  #endif
+  // allocate memory for closes
+  Close* closes = new Close[*n];
   // set closes
   for (int i = 0; i < *n; ++i)
     closes[i] = this->closes[i + start];
@@ -99,12 +94,7 @@ float* Asset::get_returns(int *n) const
 {
   *n = this->size - 1;
   // allocate memory for returns
-  float* returns;
-  #ifdef __CUDA_ARCH__
-    cudaMalloc((void **) &returns, sizeof(float) * *n);
-  #else
-    returns = new float[*n];
-  #endif
+  float* returns = new float[*n];
   // compute all daily returns on that period
   for (int i = 0; i < *n; ++i) {
       float v1 = this->closes[i].value;
@@ -124,12 +114,7 @@ float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
   // set n to returns size (closes - 1: it's dayly return)
   *n -= 1;
   // allocate memory for returns
-  float* returns;
-  #ifdef __CUDA_ARCH__
-    cudaMalloc((void **) &returns, sizeof(float) * *n);
-  #else
-    returns = new float[*n];
-  #endif
+  float* returns = new float[*n];
   // compute all daily returns on that period
   for (int i = 0; i < *n; ++i) {
     float v1 = closes[i].value;
@@ -137,11 +122,7 @@ float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
     returns[i] = (v2 - v1) / v1;
   }
   // free memory reserved for closes
-  #ifdef __CUDA_ARCH__
-    cudaFree(closes);
-  #else
-    delete[] closes;
-  #endif
+  delete[] closes;
   return returns;
 }
 
@@ -162,11 +143,7 @@ float Asset::get_volatility() const
     var += pow(returns[i] - avg, 2);
   var /= n;
   // free memory of daily returns
-  #ifdef __CUDA_ARCH__
-    cudaFree(returns);
-  #else
-    delete[] returns;
-  #endif
+  delete[] returns;
   // return volatility: sqrt(variance)
   return sqrtf(var);
 }
@@ -188,11 +165,7 @@ float Asset::get_volatility(hlp::Date start_date, hlp::Date end_date) const
     var += pow(returns[i] - avg, 2);
   var /= n;
   // free memory of daily returns
-  #ifdef __CUDA_ARCH__
-    cudaFree(returns);
-  #else
-    delete[] returns;
-  #endif
+  delete[] returns;
   // return volatility: sqrt(variance)
   return sqrtf(var);
 }

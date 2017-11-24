@@ -28,8 +28,8 @@ public:
 __host__ __device__  Close* get_closes(hlp::Date start_date, hlp::Date end_date, 
           int *n) const;
 
-  float get_return() const;
-  float get_return(hlp::Date start_date, hlp::Date end_date) const;
+__host__ __device__ float get_return() const;
+__host__ __device__ float get_return(hlp::Date start_date, hlp::Date end_date) const;
 __host__ __device__ float* get_returns(int* n) const;
 __host__ __device__ float* get_returns(hlp::Date start_date, hlp::Date end_date,
           int* n) const;

@@ -76,7 +76,7 @@ float Asset::get_return() const
   return (v2 - v1) / v1;
 }
 
-
+__host__ __device__
 float Asset::get_return(hlp::Date start_date, hlp::Date end_date) const
 {
   float v1, v2;

@@ -14,48 +14,54 @@
 namespace fin
 {
 
-__host__ __device__ Portfolio::Portfolio(int size)
+CUDA_CALLABLE_MEMBER
+Portfolio::Portfolio(int size)
 {
   this->size = size;
-  #ifdef __CUDA_ARCH__ 
+  #ifdef __CUDA_ARCH__
     // portfolio object is going to be used on gpu
     cudaMalloc((void **) &(this->assets), sizeof(Asset*) * size);
     cudaMalloc((void **) &(this->weights), sizeof(float) * size);
-  #else 
+  #else
     // portfolio object is going to be used on cpu
     this->assets = new Asset* [size];
     this->weights = new float [size];
   #endif
 }
 
-__host__ __device__ Portfolio::~Portfolio()
+CUDA_CALLABLE_MEMBER
+Portfolio::~Portfolio()
 {
-  #ifdef __CUDA_ARCH__ 
+  #ifdef __CUDA_ARCH__
     cudaFree(this->assets);
     cudaFree(this->weights);
-  #else 
+  #else
     delete[] this->assets;
     delete[] this->weights;
   #endif
 }
 
-__host__ __device__ int Portfolio::get_size() const
+CUDA_CALLABLE_MEMBER
+int Portfolio::get_size() const
 {
   return this->size;
 }
 
-__host__ __device__ Asset** Portfolio::get_assets() const
+CUDA_CALLABLE_MEMBER
+Asset** Portfolio::get_assets() const
 {
   return this->assets;
 }
 
-__host__ __device__ void Portfolio::set_assets(Asset** assets)
+CUDA_CALLABLE_MEMBER
+void Portfolio::set_assets(Asset** assets)
 {
   for (int i = 0; i < this->size; ++i)
     this->assets[i] = assets[i];
 }
 
-__host__ __device__ void Portfolio::set_weights(float* weights)
+CUDA_CALLABLE_MEMBER
+void Portfolio::set_weights(float* weights)
 {
   // check if weights sum to 1
   float sum = 0;
@@ -70,10 +76,11 @@ __host__ __device__ void Portfolio::set_weights(float* weights)
 }
 
 
-__host__ __device__ float* Portfolio::get_returns(hlp::Date start_date, hlp::Date end_date) const
+CUDA_CALLABLE_MEMBER
+float* Portfolio::get_returns(hlp::Date start_date, hlp::Date end_date) const
 {
-  float* returns; 
-  #ifdef __CUDA_ARCH__ 
+  float* returns;
+  #ifdef __CUDA_ARCH__
     cudaMalloc((void **) &(returns), sizeof(float) * this->size);
   #else
     returns = new float[this->size];
@@ -83,7 +90,8 @@ __host__ __device__ float* Portfolio::get_returns(hlp::Date start_date, hlp::Dat
   return returns;
 }
 
-__host__ __device__ float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
+CUDA_CALLABLE_MEMBER
+float Portfolio::get_return(hlp::Date start_date, hlp::Date end_date) const
 {
   float ret = 0.0;
   for (int i = 0; i < this->size; ++i) {
@@ -94,11 +102,12 @@ __host__ __device__ float Portfolio::get_return(hlp::Date start_date, hlp::Date 
   return ret;
 }
 
-__host__ __device__ float* Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const
+CUDA_CALLABLE_MEMBER
+float* Portfolio::get_covariance(hlp::Date start_date, hlp::Date end_date) const
 {
   float* covariance;
-  
-  #ifdef __CUDA_ARCH__ 
+
+  #ifdef __CUDA_ARCH__
     cudaMalloc((void **) &(covariance), sizeof(float) * this->size * this->size);
   #else
     covariance = new float[this->size * this->size];
@@ -128,9 +137,9 @@ __host__ __device__ float* Portfolio::get_covariance(hlp::Date start_date, hlp::
         for (int k = 0; k < n; ++k)
           covariance[i * this->size + j] += (ri[k] - ri_avg) * (rj[k] - rj_avg);
         covariance[i * this->size + j] /= n;
-        
+
         // freeing ri and rj
-        #ifdef __CUDA_ARCH__ 
+        #ifdef __CUDA_ARCH__
             cudaFree(ri);
             cudaFree(rj);
         #else
@@ -143,7 +152,8 @@ __host__ __device__ float* Portfolio::get_covariance(hlp::Date start_date, hlp::
   return covariance;
 }
 
-__host__ __device__ float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const
+CUDA_CALLABLE_MEMBER
+float Portfolio::get_volatility(hlp::Date start_date, hlp::Date end_date) const
 {
   float vol = 0;
   float* cov = this->get_covariance(start_date, end_date);
@@ -156,7 +166,7 @@ __host__ __device__ float Portfolio::get_volatility(hlp::Date start_date, hlp::D
     }
   }
   //free covariance
-  #ifdef __CUDA_ARCH__ 
+  #ifdef __CUDA_ARCH__
     cudaFree(cov);
   #else
     delete[] cov;
@@ -164,14 +174,15 @@ __host__ __device__ float Portfolio::get_volatility(hlp::Date start_date, hlp::D
   return sqrtf(vol);
 }
 
-__host__ __device__ float Portfolio::get_sharp(hlp::Date start_date, hlp::Date end_date) const
+CUDA_CALLABLE_MEMBER
+float Portfolio::get_sharp(hlp::Date start_date, hlp::Date end_date) const
 {
   float ret = this->get_return(start_date, end_date);
   float vol = this->get_volatility(start_date, end_date);
   return ret / vol;
 }
 
-__host__ void Portfolio::print_weights() const
+void Portfolio::print_weights() const
 {
   for (int i = 0; i < this->size; ++i) {
     float w = this->weights[i];

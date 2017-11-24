@@ -81,6 +81,7 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
     fin::Asset* p_assets[k];
     float p_weights[k];
     for (int j = 0; j < k; ++j) {
+      // portfolio_assets is a global __constant__
       int asset_id = portfolio_assets[portfolio_idx * k + j];
       p_weights[j] = 1. / k;
       p_assets[j] = &all_assets[asset_id];
@@ -97,7 +98,7 @@ __global__ void optimize_portfolios_kernel(fin::Portfolio* d_portfolios, float* 
   }
 }
 
-__host__ fin::Portfolio get_optimal_portfolio(fin::Asset *h_assets, int *port_assets,
+__host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *port_assets,
                                     hlp::Date& d1, hlp::Date& d2,
                                     int n, int nb_p, int k)
 {
@@ -146,6 +147,42 @@ __host__ fin::Portfolio get_optimal_portfolio(fin::Asset *h_assets, int *port_as
   // free host memory
   delete[] h_portfolios;
   delete[] h_sharp;
+
+  return optimal_portfolio;
+}
+
+__host__ fin::Portfolio get_optimal_portfolio_cpu(fin::Asset *assets, int *p_assets,
+                                    hlp::Date& d1, hlp::Date& d2,
+                                    int nb_assets, int nb_p, int p_size)
+{
+  fin::Portfolio optimal_portfolio;
+  float max_sharp = 0;
+
+  // optimize portfolios and return the one with max sharp
+  for (int i = 0; i < nb_p; ++i) {
+    // create portfolio
+    fin::Portfolio p = fin::Portfolio(p_size);
+    // declare portfolio assets and weights
+    fin::Asset* p_assets[p_size];
+    float p_weights[p_size];
+    for (int j = 0; j < p_size; ++j) {
+      // get portfolio assets and weights
+      int asset_id = p_assets[i * p_size + j];
+      p_weights[j] = 1. / p_size;
+      p_assets[j] = &all_assets[asset_id];
+    }
+    // set portfolio assets and weights
+    p.set_assets(p_assets);
+    p.set_weights(p_weights);
+    // optimize portfolio (get optimal weights)
+    optimize_portfolio(p, d1, d2, 0);
+    // get portfolio with max sharp
+    float sharp = p.get_sharp(d1, d2);
+    if (sharp >= max_sharp) {
+      max_sharp = sharp;
+      optimal_portfolio = p;
+    }
+  }
   
   return optimal_portfolio;
 }

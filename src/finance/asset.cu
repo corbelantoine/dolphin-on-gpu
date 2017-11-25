@@ -16,6 +16,13 @@ Asset::Asset(int id)
 }
 
 CUDA_CALLABLE_MEMBER
+Asset::Asset()
+{
+  this->id = -1;
+  this->closes = 0;
+}
+
+CUDA_CALLABLE_MEMBER
 Asset::~Asset()
 {
   if (this->closes != 0)
@@ -34,6 +41,13 @@ void Asset::set_closes(std::vector<Close> closes)
   // set closes
   for (int i = 0; i < this->size; ++i)
     this->closes[i] = closes[i];
+}
+
+CUDA_CALLABLE_MEMBER
+void Asset::set_id(int id)
+{
+  if (id > 0)
+    this->id = id;
 }
 
 CUDA_CALLABLE_MEMBER

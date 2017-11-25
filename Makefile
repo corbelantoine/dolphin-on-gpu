@@ -1,6 +1,10 @@
 # Setting GPU compiler and flags
-CPP=nvcc --std=c++11 -G -g -lineinfo -Wno-deprecated-gpu-targets 
-CPPFLAGS=-lcuda -lcublas --device-c|-dc
+CPP = nvcc --std=c++11 -G -g -lineinfo -Wno-deprecated-gpu-targets 
+# CPPFLAGS= -lcuda -lcublas -dc
+CPPFLAGS= -dc
+
+
+#--device-c
 
 # Setting library files and dir
 LDIR = lib
@@ -27,10 +31,17 @@ _OBJ = $(_SRC:.cu=.o)
 _OBJ += $(_LIB:.cu=.o)
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
+OUTPUT_OPTION = -o $(ODIR)/$@
+
 BIN=main
 
 all: $(OBJ)
-	$(CPP) $(LIB) $(SRC) $(CPPFLAGS) -o $(BIN) $(OBJ)
+
+# $(OBJ): $(SRC) $(LIB)
+# 	$(CPP) $(CPPFLAGS) -c -o $@ $<
+
+all: $(OBJ)
+	$(CPP) $(CPPFLAGS) $(SRC) 
 
 $(ODIR)/cvxgen/ldl.o: $(LDIR)/cvxgen/ldl.cu
 

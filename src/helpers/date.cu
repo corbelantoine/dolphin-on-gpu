@@ -4,7 +4,7 @@ namespace hlp
 {
 
 // CUDA_CALLABLE_MEMBER
-Date::Date(char* str_date)
+Date::Date(const char* str_date)
 {
   if (3 != sscanf(str_date, "%d-%d-%d;", &(this->year), &(this->month), &(this->day))) {
     printf("error scanning date. format: YYYY-MM-DD\n");

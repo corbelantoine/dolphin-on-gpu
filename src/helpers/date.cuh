@@ -17,7 +17,7 @@ class Date
 {
 
 public:
-  Date(char* str_date);
+  Date(const char* str_date);
   Date() = default;
   ~Date() = default;
 

@@ -14,9 +14,6 @@
 build/*
 dolphin
 
-# Data
-data/*
-
 # CLION
 .idea/*
 cmake-build-debug/*

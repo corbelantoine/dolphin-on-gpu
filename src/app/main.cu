@@ -2,7 +2,7 @@
 #include <algorithm>
 
 #include "../helpers/date.cuh"
-#include "../parsing/parse.hpp"
+#include "../parsing/parse.cuh"
 #include "../finance/portfolio.cuh"
 #include "../optimization/optimizer.cuh"
 

@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include "parse.hpp"
+#include "parse.cuh"
 #include <vector>
 #include <dirent.h>
 
@@ -51,7 +51,7 @@ fin::Asset parse(std::string path){
     json j;
     inFile >> j;
 
-    for (int i; i < j.size(); i++) {
+    for (int i = 0; i < j.size(); i++) {
         fin::Close p = fin::Close();
         p.date = hlp::Date(j[i][0].get<char*>());
         p.value = j[i][1];

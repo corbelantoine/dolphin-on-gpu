@@ -4,20 +4,20 @@ CPPFLAGS=-lcuda -lcublas --device-c|-dc
 
 # Setting library files and dir
 LDIR = lib
-_LIB=cvxgen/ldl.cu \
-	cvxgen/matrix_support.cu \
-	cvxgen/solver.cu 
+_LIB = cvxgen/ldl.cu \
+	   cvxgen/matrix_support.cu \
+	   cvxgen/solver.cu 
 
 LIB = $(parsubst %, $(LDIR)/%, $(_LIB))
 
 # Setting src files and dir
 SDIR = src
 _SRC = finance/asset.cu \
-    finance/portfolio.cu \
-    helpers/date.cu \
-		optimization/optimizer.cu \
-		app/main.cu \
-		src/parsing/parse.cpp
+	   finance/portfolio.cu \
+	   helpers/date.cu \
+	   helpers/parse.cu \
+	   optimization/optimizer.cu \
+	   app/main.cu 
 
 SRC = $(patsubst %, $(SDIR)/%, $(_SRC))
 
@@ -30,7 +30,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 BIN=main
 
 all: $(OBJ)
-	$(CPP) $(CPPFLAGS) $(LIB) $(SRC) -o $(BIN)
+	$(CPP) $(LIB) $(SRC) $(CPPFLAGS) -o $(BIN) $(OBJ)
 
 $(ODIR)/cvxgen/ldl.o: $(LDIR)/cvxgen/ldl.cu
 

@@ -1,10 +1,12 @@
 # Setting GPU compiler and flags
-CPP = nvcc --std=c++11 -G -g -lineinfo -Wno-deprecated-gpu-targets 
-# CPPFLAGS= -lcuda -lcublas -dc
-CPPFLAGS= -dc
+NVCC = nvcc 
+NVCCFLAGS= --std=c++11 -G -g -lineinfo -Wno-deprecated-gpu-targets
 
+CUDALIBS = -lcuda -lcublas 
 
-#--device-c
+##############################################################################
+
+# Sources
 
 # Setting library files and dir
 LDIR = lib
@@ -25,43 +27,64 @@ _SRC = finance/asset.cu \
 
 SRC = $(patsubst %, $(SDIR)/%, $(_SRC))
 
-# Setting obj files and dir
+##############################################################################
+
+# Objects
+
 ODIR = obj
 _OBJ = $(_SRC:.cu=.o)
 _OBJ += $(_LIB:.cu=.o)
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-OUTPUT_OPTION = -o $(ODIR)/$@
+##############################################################################
 
-BIN=main
-
+# link
 all: $(OBJ)
+	$(NVCC) $(NVCCFLAGS) $(OBJ) $(CUDALIBS) -o dolphin
 
-# $(OBJ): $(SRC) $(LIB)
-# 	$(CPP) $(CPPFLAGS) -c -o $@ $<
-
-all: $(OBJ)
-	$(CPP) $(CPPFLAGS) $(SRC) 
-
-$(ODIR)/cvxgen/ldl.o: $(LDIR)/cvxgen/ldl.cu
-
-$(ODIR)/cvxgen/matrix_support.o: $(LDIR)/cvxgen/matrix_support.cu
-
-$(ODIR)/cvxgen/solver.o: $(LDIR)/cvxgen/solver.cu $(ODIR)/cvxgen/ldl.o $(ODIR)/cvxgen/matrix_support.o
-
-$(ODIR)/helpers/date.o: $(SDIR)/helpers/date.cu
-
-$(ODIR)/helpers/parse.o: $(SDIR)/helpers/parse.cu $(ODIR)/helpers/date.o
-
-$(ODIR)/finance/asset.o: $(SDIR)/finance/asset.cu $(ODIR)/helpers/date.o
-
-$(ODIR)/finance/portfolio.o: $(SDIR)/finance/portfolio.cu $(ODIR)/finance/asset.o
-
-$(ODIR)/optimization/optimizer.o: $(SDIR)/optimization/optimizer.cu $(ODIR)/finance/portfolio.o $(ODIR)/cvxgen/solver.o 
+##############################################################################
+						# Comiple individually
+		######################################################
+					# Source code compiling
 
 $(ODIR)/app/main.o: $(SDIR)/app/main.cu $(ODIR)/optimization/optimizer.o 
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+$(ODIR)/optimization/optimizer.o: $(SDIR)/optimization/optimizer.cu $(ODIR)/finance/portfolio.o $(ODIR)/cvxgen/solver.o 
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+$(ODIR)/finance/portfolio.o: $(SDIR)/finance/portfolio.cu $(ODIR)/finance/asset.o
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+$(ODIR)/finance/asset.o: $(SDIR)/finance/asset.cu $(ODIR)/helpers/date.o
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+$(ODIR)/helpers/parse.o: $(SDIR)/helpers/parse.cu $(ODIR)/helpers/date.o
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+$(ODIR)/helpers/date.o: $(SDIR)/helpers/date.cu
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+		######################################################
+					# Cvxgen library compiling
+
+$(ODIR)/cvxgen/ldl.o: $(LDIR)/cvxgen/ldl.cu
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+$(ODIR)/cvxgen/matrix_support.o: $(LDIR)/cvxgen/matrix_support.cu
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+$(ODIR)/cvxgen/solver.o: $(LDIR)/cvxgen/solver.cu $(ODIR)/cvxgen/ldl.o $(ODIR)/cvxgen/matrix_support.o 
+	$(NVCC) $(NVCCFLAGS) -dc $< -o $@
+
+##############################################################################
+
+run: build
+	$(EXEC) ./dolphin
 
 clean:
 	$(RM) $(OBJ) $(BIN) 
 
 .PHONY: clean
+
+##############################################################################

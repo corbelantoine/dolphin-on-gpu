@@ -6,13 +6,7 @@
 #include "../finance/portfolio.cuh"
 #include "../optimization/optimizer.cuh"
 
-void print_ret_vol(std::vector<fin::Asset>& assets)
-{
-  for (auto const& asset: assets)
-    std::cout << "return: " << asset.get_return()
-              << ", volatility: " << asset.get_volatility()
-              << std::endl;
-}
+
 
 void print_ret_vol(fin::Portfolio& p, hlp::Date& start_date, hlp::Date& end_date)
 {
@@ -21,50 +15,85 @@ void print_ret_vol(fin::Portfolio& p, hlp::Date& start_date, hlp::Date& end_date
             << std::endl;
 }
 
-fin::Portfolio get_random_portfolio(std::vector<fin::Asset>& assets, size_t n = 20)
+fin::Asset* filter_assets(std::vector<fin::Asset>& assets, int nb_a)
 {
-  fin::Portfolio p(n);
-
-  std::vector<std::size_t> tmp(assets.size());
-  size_t k = 0;
-  std::generate(tmp.begin(), tmp.end(), [&k] () { return k++; });
-  std::random_shuffle(tmp.begin(), tmp.end());
-  std::vector<std::size_t> indices(tmp.begin(), tmp.begin() + n);
-
-  fin::Asset* p_assets[n];
-  float p_weights[n];
-  for (int i = 0; i < n; ++i)
-  {
-    p_assets[i] = &assets[indices[i]];
-    p_weights[i] = 1. / n;
+  if (assets.size() < nb_a) {
+    std::cerr << "nb_a must be less or equal than total number of assets a_size\n";
+    return 0;
   }
-  p.set_assets(p_assets);
-  p.set_weights(p_weights);
 
-  return p;
+  fin::Asset* filtered_assets = new fin::Asset[nb_a];
+  for (int i = 0; i < nb_a; ++i)
+    filtered_assets[i] = assets[i];
+  return filtered_assets;
+}
+
+fin::Asset* get_assets(hlp::Date d1, hlp::Date d2, int* n)
+{
+  try {
+    std::vector<fin::Asset> assets = getAssets(d3, d4);
+    return filter_assets(assets, n);
+  } catch(const std::exception& e) {
+    std::cout << e.what() << std::endl ;
+  }
+}
+
+std::vector<int> shuffled_vector(const int size)
+{
+  std::vector<int> ret(size);
+  // generate unique numbers from 0 to size
+  int k = 0;
+  std::generate(ret.begin(), ret.end(), [&k] () { return k++; });
+  // get random function to swap
+  std::random_device rd;
+  std::mt19937 g(rd());
+  // shuffle randomly tmp
+  std::shuffle(ret.begin(), ret.end(), g);
+  return ret
+}
+
+int* random_map(const int nb_a, const int nb_p, const int p_size = 20)
+{
+  if (p_size < nb_a) {
+    std::cerr << "portfolio size must be less or equal than number of total assets a_size\n";
+    return 0;
+  }
+  // allocate memory for the random map
+  int* map = new int[nb_p * p_size];
+  // filling the map randomly by line
+  for (int i = 0; i < nb_p; ++i) {
+    // get random unique numbers from 0 to nb_a
+    std::vector<int> vec = shuffled_vector(nb_a);
+    // take first p_size numbers
+    for (int j = 0; j < p_size; ++j)
+      map[i * p_size + j] = vec[j];
+ }
+ return map;
 }
 
 int main(int argc, char* argv[])
 {
-  hlp::Date d1 = hlp::Date("2008-07-01");
-  hlp::Date d2 = hlp::Date("2016-07-01");
 
-  hlp::Date d3 = hlp::Date("2010-07-01");
-  hlp::Date d4 = hlp::Date("2010-08-01");
+  hlp::Date d1 = hlp::Date("2010-07-01");
+  hlp::Date d2 = hlp::Date("2010-08-01");
 
-  try {
-    std::vector<fin::Asset> assets = getAssets(d3, d4);
-    std::cout << "Getting random portfolio\n";
-    fin::Portfolio p = get_random_portfolio(assets, 20);
+  const int nb_a = 50;
+  const int nb_p = 100;
+  const int p_size = 20;
 
-    std::cout << "before optimization:\n";
-    print_ret_vol(p, d3, d4);
-//    opt::optimize_portfolio(p, d3, d4);
-    std::cout << "after optimization:\n";
-    print_ret_vol(p, d3, d4);
-  } catch(const std::exception& e) {
-    std::cout << e.what() << std::endl ;
-  }
+  std::cout << "Getting assets...\n";
+  fin::Asset* assets = get_assets(d1, d2, &nb_a);
+  std::cout << "Getting assets done.\n";
+  std::cout << "Getting random map...\n";
+  int* map = random_map(nb_a, nb_p, p_size);
+  std::cout << "Getting random map done.\n";
+  std::cout << "Finding best portfolio...\n";
+  fin::Portfolio p = opt::get_optimal_portfolio_cpu(assets, map, d1, d2, nb_a, nb_p, p_size);
+  std::cout << "Finding best portfolio done.\n";
+
+  print_ret_vol(p, d1, d2);
+
+
 
   return 0;
 }

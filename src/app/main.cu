@@ -91,8 +91,7 @@ int main(int argc, char* argv[])
 
     p.print_weights();
     
-    // std::cout << "return: " << p.get_return(d1, d2) << std::endl;
-    std::cout << "volatility: " << p.get_volatility(d1, d2) << std::endl;
+    std::cout << "sharp: " << p.get_sharp(d1, d2) << std::endl;
 
     
     delete [] *assets;

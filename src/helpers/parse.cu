@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include "parse.cuh"
-#include <vector>
 #include <dirent.h>
 
 using json = nlohmann::json;
@@ -71,28 +70,50 @@ bool trim_closes(fin::Asset& asset, hlp::Date& start_date, hlp::Date& end_date)
     }
 }
 
-std::vector<fin::Asset> getAssets(hlp::Date& start_date, hlp::Date& end_date)
+fin::Asset* get_assets(hlp::Date& start_date, hlp::Date& end_date, int *size)
 {
     std::cout << "Reading all files, this may take some time ..." << std::endl;
-    std::vector<fin::Asset> ret;
-    
+    fin::Asset* assets = 0;
+    int max_size = 1000;
+    *size = 0;
     DIR *dir = opendir("data/cleaned");
-    if (dir) {
+    if (dir)
+    {
+        assets = new fin::Asset[max_size];
         struct dirent *ent = readdir(dir);
         fin::Asset asset;
-        while (ent) {
-            if (std::string(ent->d_name).compare(0, 1 , ".")) {
+        while (ent) 
+        {
+            if (std::string(ent->d_name).compare(0, 1 , ".")) 
+            {
                 parse(std::string("data/cleaned/").append(ent->d_name), asset);
                 if (trim_closes(asset, start_date, end_date))
-                    ret.push_back(asset);
+                {
+                    assets[*size] = asset;
+                    *size += 1;
+                    if (*size == max_size) 
+                    {
+                        fin::Asset *tmp = new fin::Asset [2 * max_size];
+                        for (int i = 0; i < max_size; ++i)
+                            tmp[i] = assets[i];
+                        delete [] assets;
+                        assets = tmp;
+                        max_size *= 2;
+                    }
+                }
             }
             ent = readdir(dir);
         }
         closedir (dir);
     } else
         throw std::invalid_argument("There is no file to read");
+    fin::Asset *tmp = new fin::Asset [*size];
+    for (int i = 0; i < *size; ++i)
+        tmp[i] = assets[i];
+    delete [] assets;
+    assets = tmp;
     std::cout << "Done! All files are read and parsed." << std::endl;
-    return ret;
+    return assets;
 }
 
 

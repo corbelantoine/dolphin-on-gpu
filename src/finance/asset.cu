@@ -14,6 +14,7 @@ CUDA_CALLABLE_MEMBER
 Asset::Asset(int id)
 {
   this->id = id;
+  this->size = 0;
   this->closes = 0;
 }
 
@@ -21,12 +22,33 @@ CUDA_CALLABLE_MEMBER
 Asset::Asset()
 {
   this->id = -1;
+  this->size = 0;
   this->closes = 0;
 }
 
 CUDA_CALLABLE_MEMBER
+Asset::Asset(const Asset& asset)
+{
+    this->id = asset.id;
+    this->size = asset.size;
+    this->closes = 0;
+    if (asset.closes != 0) {
+        // deep copy asset closes
+        printf("deep copying asset closes\n");
+        this->closes = new Close [asset.size];
+        for (int i = 0; i < asset.size; ++i)
+            this->closes[i] = asset.closes[i];
+    }
+}
+
+    
+CUDA_CALLABLE_MEMBER
 Asset::~Asset()
 {
+    if (this->closes != 0) {
+        delete [] this->closes;
+        this->closes = 0;
+    }
 }
 
 
@@ -36,11 +58,12 @@ void Asset::set_closes(std::vector<Close> closes)
   this->sort_closes(closes);
   // set closes size
   this->size = closes.size();
-  // allocate closes
+  // delete old closes if existing
   if (this->closes != 0) {
       delete [] this->closes;
       this->closes = 0;
   }
+  // allocate closes
   this->closes = new Close[this->size];
   // set closes
   for (int i = 0; i < this->size; ++i)
@@ -58,14 +81,20 @@ CUDA_CALLABLE_MEMBER
 Close* Asset::get_closes(int *n) const
 {
   *n = this->size;
-  return this->closes;
+  // allocate memory for closes
+  Close* closes = new Close[*n];
+  // set closes
+  for (int i = 0; i < *n; ++i)
+    closes[i] = this->closes[i];
+  return closes;
 }
 
 CUDA_CALLABLE_MEMBER
 Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
         int *n) const
 {
-  int start, end;
+  int start = 0;
+  int end = -1;
   // get period (start -> end)
   for(int i = 0; i < this->size; ++i) {
     if (this->closes[i].date == start_date)
@@ -77,6 +106,10 @@ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
   }
   // set size of return array
   *n = end - start;
+  if (*n <= 0) {
+      printf("Woow, couldn't find closes with theses dates\n");
+      return 0;
+  }
   // allocate memory for closes
   Close* closes = new Close[*n];
   // set closes
@@ -128,9 +161,11 @@ float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
         int* n) const
 {
   // get asset closes on this period (start->end)
+  printf("get_closes\n");
   Close* closes = this->get_closes(start_date, end_date, n);
   // set n to returns size (closes - 1: it's dayly return)
   *n -= 1;
+  printf("get_returns: %d\n", *n);
   // allocate memory for returns
   float* returns = new float[*n];
   // compute all daily returns on that period

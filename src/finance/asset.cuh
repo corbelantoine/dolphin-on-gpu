@@ -25,8 +25,9 @@ struct Close
 class Asset
 {
 public:
-  CUDA_CALLABLE_MEMBER Asset(int id);
   CUDA_CALLABLE_MEMBER Asset();
+  CUDA_CALLABLE_MEMBER Asset(int id);
+  CUDA_CALLABLE_MEMBER Asset(const Asset& asset);
   CUDA_CALLABLE_MEMBER ~Asset();
 
   void set_closes(std::vector<Close> closes);

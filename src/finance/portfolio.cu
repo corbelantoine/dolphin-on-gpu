@@ -99,7 +99,7 @@ void Portfolio::set_weights(float* weights)
     for (int i = 0; i < this->size; ++i)
       this->weights[i] = weights[i]; // set weights
   else
-    printf("Weights must sum to 1");
+    printf("Weights must sum to 1\n");
 }
 
 

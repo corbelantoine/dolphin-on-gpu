@@ -17,3 +17,6 @@ dolphin
 # CLION
 .idea/*
 cmake-build-debug/*
+
+# nvcc
+vgcore*

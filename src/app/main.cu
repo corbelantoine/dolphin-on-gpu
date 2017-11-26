@@ -9,13 +9,6 @@
 
 
 
-void print_ret_vol(fin::Portfolio& p, hlp::Date& start_date, hlp::Date& end_date)
-{
-  std::cout << "return: " << p.get_return(start_date, end_date)
-            << ", volatility: " << p.get_volatility(start_date, end_date)
-            << std::endl;
-}
-
 void filter_assets(fin::Asset** assets, const int size, const int nb_a)
 {
   if (size < nb_a)
@@ -92,21 +85,15 @@ int main(int argc, char* argv[])
     std::cout << "Getting random map...\n";
     int* map = random_map(nb_a, nb_p, p_size);
     std::cout << "Getting random map done.\n";
-//    for (int i = 0; i < nb_p; ++i)
-//    {
-//        for (int j = 0; j < p_size; ++j)
-//        {
-//            int idx = map[i * p_size + j];
-//            fin::Asset* asset = *assets + idx;
-//            std::cout << "asset " << idx << " : " << asset->get_sharp(d1, d2);
-//            std::cout << std::endl;
-//        }
-//    }
     std::cout << "Finding best portfolio...\n";
-    fin::Portfolio p = opt::get_optimal_portfolio_cpu(assets, map, d1, d2, nb_a, nb_p, p_size);
+    fin::Portfolio p = opt::get_optimal_portfolio_gpu(assets, map, d1, d2, nb_a, nb_p, p_size);
     std::cout << "Finding best portfolio done.\n";
 
-    print_ret_vol(p, d1, d2);
+    p.print_weights();
+    
+    // std::cout << "return: " << p.get_return(d1, d2) << std::endl;
+    std::cout << "volatility: " << p.get_volatility(d1, d2) << std::endl;
+
     
     delete [] *assets;
     delete assets;

@@ -38,9 +38,11 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 ##############################################################################
 
+BIN = dolphin
+
 # link
 all: $(OBJ)
-	$(NVCC) $(NVCCFLAGS) $(OBJ) $(CUDALIBS) -o dolphin
+	$(NVCC) $(NVCCFLAGS) $(OBJ) $(CUDALIBS) -o $(BIN)
 
 ##############################################################################
 						# Comiple individually

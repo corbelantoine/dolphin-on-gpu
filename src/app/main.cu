@@ -63,8 +63,8 @@ int* random_map(const int nb_a, const int nb_p, const int p_size = 20)
 int main(int argc, char* argv[])
 {
 
-    hlp::Date d1 = hlp::Date("2010-07-01");
-    hlp::Date d2 = hlp::Date("2010-08-01");
+    hlp::Date d1 = hlp::Date("2012-01-01");
+    hlp::Date d2 = hlp::Date("2017-06-30");
 
     const int nb_a = 50;
     const int nb_p = 100;

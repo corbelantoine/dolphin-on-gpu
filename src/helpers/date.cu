@@ -6,9 +6,8 @@ namespace hlp
 // CUDA_CALLABLE_MEMBER
 Date::Date(const char* str_date)
 {
-  if (3 != sscanf(str_date, "%d-%d-%d;", &(this->year), &(this->month), &(this->day))) {
+  if (3 != sscanf(str_date, "%d-%d-%d;", &(this->year), &(this->month), &(this->day)))
     printf("error scanning date. format: YYYY-MM-DD\n");
-  }
 }
 
 CUDA_CALLABLE_MEMBER
@@ -42,8 +41,10 @@ void Date::set_month(int month)
   if (month > 0 and month < 13)
     this->month = month;
 }
+
 CUDA_CALLABLE_MEMBER
-void Date::set_year(int year) {
+void Date::set_year(int year)
+{
   if (year > 1900 && year < 2100)
     this->year = year;
 }
@@ -66,7 +67,6 @@ bool Date::operator<(const Date& d) const
     return true;
   return false;
 }
-
 
 CUDA_CALLABLE_MEMBER
 bool Date::operator>(const Date& d) const

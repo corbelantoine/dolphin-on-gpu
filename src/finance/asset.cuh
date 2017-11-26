@@ -28,6 +28,7 @@ public:
   CUDA_CALLABLE_MEMBER Asset();
   CUDA_CALLABLE_MEMBER Asset(int id);
   CUDA_CALLABLE_MEMBER Asset(const Asset& asset);
+
   CUDA_CALLABLE_MEMBER ~Asset();
 
   CUDA_CALLABLE_MEMBER Asset operator=(const Asset& asset);
@@ -45,6 +46,11 @@ public:
   // get the volatility of an asset
   CUDA_CALLABLE_MEMBER float get_volatility() const;
   CUDA_CALLABLE_MEMBER float get_volatility(hlp::Date start_date, hlp::Date end_date) const;
+  // get sharp
+  CUDA_CALLABLE_MEMBER float get_sharp() const;
+  CUDA_CALLABLE_MEMBER float get_sharp(hlp::Date start_date, hlp::Date end_date) const;
+
+
 
   // methods for optimizing portfolio
   CUDA_CALLABLE_MEMBER float* get_returns(int* n) const;

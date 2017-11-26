@@ -33,10 +33,39 @@ Portfolio::Portfolio(int size)
 }
 
 CUDA_CALLABLE_MEMBER
+Portfolio::Portfolio(const Portfolio& portfolio)
+{
+    this->size = portfolio.size;
+    this->assets = new Asset* [this->size];
+    this->weights = new float [this->size];
+    // deep copy assets and weights
+    for (int i = 0; i < this->size; ++i)
+    {
+        this->assets[i] = portfolio.assets[i];
+        this->weights[i] = portfolio.weights[i];
+    }
+}
+    
+CUDA_CALLABLE_MEMBER
 Portfolio::~Portfolio()
 {
   delete[] this->assets;
   delete[] this->weights;
+}
+
+CUDA_CALLABLE_MEMBER
+Portfolio Portfolio::operator=(const Portfolio& portfolio)
+{
+    this->size = portfolio.size;
+    this->assets = new Asset* [this->size];
+    this->weights = new float [this->size];
+    // deep copy assets and weights
+    for (int i = 0; i < this->size; ++i)
+    {
+        this->assets[i] = portfolio.assets[i];
+        this->weights[i] = portfolio.weights[i];
+    }
+    return *this;
 }
 
 CUDA_CALLABLE_MEMBER

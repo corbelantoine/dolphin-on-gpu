@@ -37,6 +37,11 @@ __host__ __device__ void optimize_portfolio(fin::Portfolio& p, hlp::Date& d1, hl
   setup_indexing(work, vars);
 
   const int p_size = 20;
+  if (p.get_size() != p_size) 
+  {
+      printf("optimize_portfolio error: only portfolios of size %d\n", p_size);
+      return;
+  }
 
   // setting the quadratic problem
   // set Sigma to the covariance matrix
@@ -148,9 +153,14 @@ __host__ fin::Portfolio get_optimal_portfolio_gpu(fin::Asset *h_assets, int *map
   return optimal_portfolio;
 }
 
-__host__ fin::Portfolio get_optimal_portfolio_cpu(fin::Asset *h_assets, int *map_portfolio_assets,
-                                    hlp::Date& d1, hlp::Date& d2,
-                                    const int nb_assets, const int nb_p, const int p_size)
+__host__ 
+fin::Portfolio get_optimal_portfolio_cpu(fin::Asset **h_assets,
+                                         int *map_portfolio_assets,
+                                         hlp::Date& d1,
+                                         hlp::Date& d2,
+                                         const int nb_assets,
+                                         const int nb_p,
+                                         const int p_size)
 {
   fin::Portfolio optimal_portfolio(p_size);
   float max_sharp = 0;
@@ -164,9 +174,9 @@ __host__ fin::Portfolio get_optimal_portfolio_cpu(fin::Asset *h_assets, int *map
     float p_weights[p_size];
     for (int j = 0; j < p_size; ++j) {
       // get portfolio assets and weights
-      int asset_id = map_portfolio_assets[i * p_size + j];
+      int asset_idx = map_portfolio_assets[i * p_size + j];
       p_weights[j] = 1. / p_size;
-      p_assets[j] = &h_assets[asset_id];
+      p_assets[j] = *h_assets + asset_idx;
     }
     // set portfolio assets and weights
     p.set_assets(p_assets);

@@ -53,7 +53,8 @@ Asset Asset::operator=(const Asset& asset)
         this->closes = new Close [asset.size];
         for (int i = 0; i < asset.size; ++i)
             this->closes[i] = asset.closes[i];
-    }
+    } else 
+        printf("Hahaaa = \n");
     return *this;
 }
 
@@ -71,12 +72,18 @@ Asset::~Asset()
 
 void Asset::set_closes(std::vector<Close> closes)
 {
+  if (closes.size() == 0) 
+  {
+      printf("closes is empty\n");
+      return;
+  }
   // sort closes by date
   this->sort_closes(closes);
   // set closes size
   this->size = closes.size();
   // delete old closes if existing
-  if (this->closes != 0) {
+  if (this->closes != 0)
+  {
       delete [] this->closes;
       this->closes = 0;
   }
@@ -113,17 +120,20 @@ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
   int start = 0;
   int end = -1;
   // get period (start -> end)
-  for(int i = 0; i < this->size; ++i) {
-    if (this->closes[i].date == start_date)
-      start = i;
-    if (this->closes[i].date == end_date) {
-      end = i;
-      continue;
-    }
+  for(int i = 0; i < this->size; ++i)
+  {
+      if (this->closes[i].date == start_date)
+          start = i;
+      if (this->closes[i].date == end_date) 
+      {
+          end = i;
+          continue;
+      }
   }
   // set size of return array
   *n = end - start;
-  if (*n <= 0) {
+  if (*n <= 0)
+  {
       printf("Woow, couldn't find closes with theses dates\n");
       return 0;
   }
@@ -131,7 +141,7 @@ Close* Asset::get_closes(hlp::Date start_date, hlp::Date end_date,
   Close* closes = new Close[*n];
   // set closes
   for (int i = 0; i < *n; ++i)
-    closes[i] = this->closes[i + start];
+      closes[i] = this->closes[i + start];
   return closes;
 }
 
@@ -178,11 +188,9 @@ float* Asset::get_returns(hlp::Date start_date, hlp::Date end_date,
         int* n) const
 {
   // get asset closes on this period (start->end)
-  printf("get_closes\n");
   Close* closes = this->get_closes(start_date, end_date, n);
   // set n to returns size (closes - 1: it's dayly return)
   *n -= 1;
-  printf("get_returns: %d\n", *n);
   // allocate memory for returns
   float* returns = new float[*n];
   // compute all daily returns on that period
@@ -238,6 +246,22 @@ float Asset::get_volatility(hlp::Date start_date, hlp::Date end_date) const
   delete[] returns;
   // return volatility: sqrt(variance)
   return sqrtf(var);
+}
+
+CUDA_CALLABLE_MEMBER 
+float Asset::get_sharp() const
+{
+    float ret = this->get_return();
+    float vol = this->get_volatility();
+    return ret / vol;
+}
+  
+CUDA_CALLABLE_MEMBER 
+float Asset::get_sharp(hlp::Date start_date, hlp::Date end_date) const
+{
+    float ret = this->get_return(start_date, end_date);
+    float vol = this->get_volatility(start_date, end_date);
+    return ret / vol;
 }
 
 // sort using a custom function object

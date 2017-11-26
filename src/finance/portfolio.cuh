@@ -19,8 +19,12 @@ class Portfolio
 public:
   CUDA_CALLABLE_MEMBER Portfolio();
   CUDA_CALLABLE_MEMBER Portfolio(int size);
+  CUDA_CALLABLE_MEMBER Portfolio(const Portfolio& portfolio);
+  
   CUDA_CALLABLE_MEMBER ~Portfolio();
 
+  CUDA_CALLABLE_MEMBER Portfolio operator=(const Portfolio& portfolio);
+  
   // setters
   CUDA_CALLABLE_MEMBER  void set_assets(Asset** assets);
   CUDA_CALLABLE_MEMBER  void set_weights(float* weights);

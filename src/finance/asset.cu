@@ -32,20 +32,37 @@ Asset::Asset(const Asset& asset)
     this->id = asset.id;
     this->size = asset.size;
     this->closes = 0;
-    if (asset.closes != 0) {
+    if (asset.closes != 0)
+    {
         // deep copy asset closes
-        printf("deep copying asset closes\n");
         this->closes = new Close [asset.size];
         for (int i = 0; i < asset.size; ++i)
             this->closes[i] = asset.closes[i];
     }
 }
 
+CUDA_CALLABLE_MEMBER
+Asset Asset::operator=(const Asset& asset)
+{
+    this->id = asset.id;
+    this->size = asset.size;
+    this->closes = 0;
+    if (asset.closes != 0)
+    {
+        // deep copy asset closes
+        this->closes = new Close [asset.size];
+        for (int i = 0; i < asset.size; ++i)
+            this->closes[i] = asset.closes[i];
+    }
+    return *this;
+}
+
     
 CUDA_CALLABLE_MEMBER
 Asset::~Asset()
 {
-    if (this->closes != 0) {
+    if (this->closes != 0) 
+    {
         delete [] this->closes;
         this->closes = 0;
     }

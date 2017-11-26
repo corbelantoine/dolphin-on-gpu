@@ -10,6 +10,9 @@ void parse(std::string path, fin::Asset& asset){
     std::string data;
 
     // TODO parse id
+    int id = std::stoi(path.substr(path.find_last_of('/')  + 1));
+    asset.set_id(id);
+
 
     inFile.open(path);
     if (!inFile)

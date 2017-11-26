@@ -93,7 +93,6 @@ int main(int argc, char* argv[])
     
     std::cout << "sharp: " << p.get_sharp(d1, d2) << std::endl;
 
-    
     delete [] *assets;
     delete assets;
 

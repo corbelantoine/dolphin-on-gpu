@@ -92,6 +92,11 @@ int main(int argc, char* argv[])
     p.print_weights();
     
     std::cout << "sharp: " << p.get_sharp(d1, d2) << std::endl;
+    auto weights = p.get_weights();
+    auto passets = p.get_assets();
+    for (int i = 0; i < p.get_size(); i++)
+        std::cout << "Asset: " << passets[i]->get_id() << " Weight: " << weights[i] << std::endl;
+
 
     delete [] *assets;
     delete assets;

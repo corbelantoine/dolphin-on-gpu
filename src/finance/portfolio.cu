@@ -81,6 +81,12 @@ Asset** Portfolio::get_assets() const
 }
 
 CUDA_CALLABLE_MEMBER
+float* Portfolio::get_weights() const
+{
+  return this->weights;
+}
+
+CUDA_CALLABLE_MEMBER
 void Portfolio::set_assets(Asset** assets)
 {
   for (int i = 0; i < this->size; ++i)

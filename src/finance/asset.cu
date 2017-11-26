@@ -102,7 +102,7 @@ void Asset::set_id(int id)
 }
 
 CUDA_CALLABLE_MEMBER
-void get_id()
+int Asset::get_id()
 {
   return this->id;
 }

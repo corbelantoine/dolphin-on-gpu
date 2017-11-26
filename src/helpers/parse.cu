@@ -5,8 +5,6 @@
 
 using json = nlohmann::json;
 
-
-
 void parse(std::string path, fin::Asset& asset){
     std::ifstream inFile;
     std::string data;
@@ -14,7 +12,8 @@ void parse(std::string path, fin::Asset& asset){
     // TODO parse id
 
     inFile.open(path);
-    if (!inFile) {
+    if (!inFile)
+    {
         std::cout << "Unable to open file";
         return;
     }
@@ -24,7 +23,8 @@ void parse(std::string path, fin::Asset& asset){
     
     // setting closes
     std::vector<fin::Close> closes(j.size());
-    for (int i = 0; i < j.size(); ++i) {
+    for (int i = 0; i < j.size(); ++i)
+    {
         // create close i
         fin::Close close = fin::Close();
         // get close date
@@ -70,7 +70,7 @@ bool trim_closes(fin::Asset& asset, hlp::Date& start_date, hlp::Date& end_date)
     }
 }
 
-fin::Asset* get_assets(hlp::Date& start_date, hlp::Date& end_date, int *size)
+fin::Asset* get_assets(hlp::Date& start_date, hlp::Date& end_date, int* size)
 {
     std::cout << "Reading all files, this may take some time ..." << std::endl;
     fin::Asset* assets = 0;

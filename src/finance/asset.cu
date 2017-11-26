@@ -4,6 +4,8 @@
 #include <numeric>
 #include <algorithm>
 
+#include <stdio.h>
+
 
 namespace fin
 {
@@ -25,8 +27,6 @@ Asset::Asset()
 CUDA_CALLABLE_MEMBER
 Asset::~Asset()
 {
-  if (this->closes != 0)
-    delete[] this->closes;
 }
 
 
@@ -37,6 +37,10 @@ void Asset::set_closes(std::vector<Close> closes)
   // set closes size
   this->size = closes.size();
   // allocate closes
+  if (this->closes != 0) {
+      delete [] this->closes;
+      this->closes = 0;
+  }
   this->closes = new Close[this->size];
   // set closes
   for (int i = 0; i < this->size; ++i)

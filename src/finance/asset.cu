@@ -102,6 +102,12 @@ void Asset::set_id(int id)
 }
 
 CUDA_CALLABLE_MEMBER
+void get_id()
+{
+  return this->id;
+}
+
+CUDA_CALLABLE_MEMBER
 Close* Asset::get_closes(int *n) const
 {
   *n = this->size;

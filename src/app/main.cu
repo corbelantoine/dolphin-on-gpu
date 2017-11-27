@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     int* map = random_map(nb_a, nb_p, p_size);
     std::cout << "Getting random map done.\n";
     std::cout << "Finding best portfolio...\n";
-    fin::Portfolio p = opt::get_optimal_portfolio_gpu(assets, map, d1, d2, nb_a, nb_p, p_size);
+    fin::Portfolio p = opt::get_optimal_portfolio_cpu(assets, map, d1, d2, nb_a, nb_p, p_size);
     std::cout << "Finding best portfolio done.\n";
 
     p.print_weights();

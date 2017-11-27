@@ -1,6 +1,9 @@
 # dolphin-on-gpu
 
-### Pour lancer le projet :
-besoin d'une carte graphique et de cuda.
-`make` génère les binaires à la racine
+### Requirements:
+nvcc compiler installed for cuda code
 
+### Test Project :
+`make` compile code and generate executable binary 
+
+`./dolphin` to execute
